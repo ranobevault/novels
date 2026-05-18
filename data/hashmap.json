@@ -53,6 +53,17 @@
     "file": "K8XsPQdR6.json",
     "locked": false,
     "prev": "YLdVeE4a6",
-    "next": null
+    "next": "I2DoLm1sj"
+  },
+  "I2DoLm1sj": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 3,
+    "file": "I2DoLm1sj.json",
+    "locked": true,
+    "prev": "K8XsPQdR6",
+    "next": null,
+    "adwallUrl": "https://link-center.net/5798120/ryrlRaOSBD0b",
+    "unlockKey": "uk_G2WcdPawh7"
   }
 }
