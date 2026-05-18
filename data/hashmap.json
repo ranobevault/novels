@@ -44,6 +44,15 @@
     "file": "n5g0r.json",
     "locked": false,
     "prev": null,
+    "next": "K8XsPQdR6"
+  },
+  "K8XsPQdR6": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 2,
+    "file": "K8XsPQdR6.json",
+    "locked": false,
+    "prev": "YLdVeE4a6",
     "next": null
   }
 }
