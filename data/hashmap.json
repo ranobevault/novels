@@ -149,6 +149,17 @@
     "file": "u8SRb4eOV.json",
     "locked": false,
     "prev": "sMvZmYhE7",
-    "next": null
+    "next": "LnVu09qm3"
+  },
+  "LnVu09qm3": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 6,
+    "file": "LnVu09qm3.json",
+    "locked": true,
+    "prev": "u8SRb4eOV",
+    "next": null,
+    "adwallUrl": "https://link-center.net/5798120/dSsws33Tt0o0",
+    "unlockKey": "uk_qgmMqpgR4u"
   }
 }
