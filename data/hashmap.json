@@ -140,6 +140,15 @@
     "file": "sMvZmYhE7.json",
     "locked": false,
     "prev": "I2DoLm1sj",
+    "next": "u8SRb4eOV"
+  },
+  "u8SRb4eOV": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 5,
+    "file": "u8SRb4eOV.json",
+    "locked": false,
+    "prev": "sMvZmYhE7",
     "next": null
   }
 }
