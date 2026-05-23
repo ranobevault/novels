@@ -35,6 +35,13 @@
       "title": "Chapter 4: Experimental Machine",
       "hash": "u8SRb4eOV",
       "locked": false
+    },
+    {
+      "volume": 1,
+      "chapter": 6,
+      "title": "Chapter 5: Failed Experiment",
+      "hash": "LnVu09qm3",
+      "locked": true
     }
   ]
 }
