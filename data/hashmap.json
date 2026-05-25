@@ -91,7 +91,7 @@
     "file": "Rd3nU3LHt.json",
     "locked": true,
     "prev": "a4iutIg6I",
-    "next": null,
+    "next": "r76ctQieG",
     "adwallUrl": "https://direct-link.net/5798120/jOLiC5XB0t2v",
     "unlockKey": "uk_dbXP6XFWwe"
   },
@@ -190,5 +190,14 @@
     "next": null,
     "adwallUrl": "https://direct-link.net/5798120/9Bpfm5MOkDrH",
     "unlockKey": "uk_Rp3Jvccf9J"
+  },
+  "r76ctQieG": {
+    "series": "reborn-as-an-extra-in-a-magical-girl-anime-i-ll-save-those-girls-but-only-because-i-want-to-see-them-cry",
+    "volume": 1,
+    "chapter": 8,
+    "file": "r76ctQieG.json",
+    "locked": false,
+    "prev": "Rd3nU3LHt",
+    "next": null
   }
 }
