@@ -94,7 +94,7 @@
   }
   .mode-toggle:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* PROGRESS BAR / PAGE INDICATOR */
+  /* PROGRESS BAR */
   .progress-bar {
     position: fixed; top: 52px; left: 0; right: 0; z-index: 98;
     height: 2px; background: var(--border);
@@ -105,11 +105,7 @@
   }
 
   /* PAGINATION */
-  .chapter-wrap { position: relative; }
-  .page-view {
-    min-height: 60vh;
-    animation: pageFadeIn 0.22s ease;
-  }
+  .page-view { animation: pageFadeIn 0.22s ease; }
   @keyframes pageFadeIn {
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -124,15 +120,13 @@
     color: var(--text2); border-radius: var(--radius);
     padding: 10px 20px; cursor: pointer;
     font-family: 'Lato', sans-serif; font-size: 0.82rem;
-    transition: all 0.2s; display: flex; align-items: center; gap: 6px;
-    min-width: 90px; justify-content: center;
+    transition: all 0.2s; min-width: 90px;
   }
   .page-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
   .page-btn:disabled { opacity: 0.28; cursor: default; }
   .page-counter {
     font-size: 0.78rem; color: var(--text3);
-    letter-spacing: 0.1em; text-align: center;
-    white-space: nowrap;
+    letter-spacing: 0.1em; text-align: center; white-space: nowrap;
   }
   .page-counter strong { color: var(--accent); font-size: 0.95rem; }
 
@@ -462,87 +456,170 @@ async function init() {
   }
 }
 
+// ── CSS Obfuscation helpers (module scope so renderPage can use them) ────────
+const JUNK_POOL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+function randJunk(len) {
+  let s = '';
+  for (let i = 0; i < len; i++)
+    s += JUNK_POOL[Math.floor(Math.random() * JUNK_POOL.length)];
+  return s;
+}
+function obfuscatePara(text) {
+  const esc = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const words = esc.split(' ');
+  return words.map((word, i) => {
+    if (!word) return '';
+    const style = i % 2 === 0
+      ? `display:none`
+      : `font-size:0;color:transparent;position:absolute`;
+    const junk = randJunk(4 + Math.floor(Math.random() * 5));
+    return `${word}<span aria-hidden="true" style="${style}" class="_jnk">${junk}</span>`;
+  }).join(' ');
+}
+function processContent(paragraphs) {
+  let html = '';
+  let codeBuffer = [];
+  let inCode = false;
+  paragraphs.forEach(para => {
+    if (para.startsWith('[img]')) {
+      if (inCode) { html += `<pre>${codeBuffer.join('\n')}</pre>`; codeBuffer = []; inCode = false; }
+      const url = para.slice(5).trim();
+      html += `<figure class="chapter-illustration"><img src="${url}" alt="Illustration" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>`;
+      return;
+    }
+    const isCode = para.startsWith('>') || para.startsWith('spell ') || para.startsWith('//') || para.startsWith('NAME:') || para.startsWith('SYSTEM');
+    if (isCode) {
+      codeBuffer.push(para.replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+      inCode = true;
+    } else {
+      if (inCode) { html += `<pre>${codeBuffer.join('\n')}</pre>`; codeBuffer = []; inCode = false; }
+      html += `<p>${obfuscatePara(para)}</p>`;
+    }
+  });
+  if (codeBuffer.length) html += `<pre>${codeBuffer.join('\n')}</pre>`;
+  return html;
+}
+
+// ── Pagination state ──────────────────────────────────────────────────────────
+let allPages = [];
+let currentPage = 0;
+const PARAS_PER_PAGE = 8;
+
+function buildPages(paragraphs) {
+  const pages = [];
+  let buf = [];
+  paragraphs.forEach(para => {
+    buf.push(para);
+    const nonCode = buf.filter(p =>
+      !p.startsWith('>') && !p.startsWith('//') && !p.startsWith('NAME:') &&
+      !p.startsWith('SYSTEM') && !p.startsWith('spell ') && !p.startsWith('[img]'));
+    if (nonCode.length >= PARAS_PER_PAGE) { pages.push([...buf]); buf = []; }
+  });
+  if (buf.length) pages.push(buf);
+  return pages;
+}
+
+function renderPage(pageIndex) {
+  currentPage = pageIndex;
+  const pageData = allPages[pageIndex];
+  const entry = currentEntry;
+  const d = chapterData;
+  const prevEntry = entry.prev ? hashmapData[entry.prev] : null;
+  const nextEntry = entry.next ? hashmapData[entry.next] : null;
+  const isLastPage = pageIndex === allPages.length - 1;
+  const isFirstPage = pageIndex === 0;
+
+  // Update progress bar
+  const bar = document.getElementById('progress');
+  if (bar) bar.style.width = allPages.length <= 1 ? '100%' : ((pageIndex / (allPages.length - 1)) * 100) + '%';
+
+  // Save page position
+  localStorage.setItem(`pos_${hash}`, pageIndex);
+
+  let bodyHtml = '';
+  if (isFirstPage) {
+    bodyHtml += `
+      <div class="chapter-header">
+        <div class="chapter-series" id="series-breadcrumb">Loading series...</div>
+        <h1 class="chapter-title">${escHtml(d.title)}</h1>
+        <div class="chapter-divider"><span>✦ ✦ ✦</span></div>
+      </div>`;
+  }
+  bodyHtml += `<div class="chapter-body">${processContent(pageData)}</div>`;
+
+  let navHtml = `
+    <div class="page-nav">
+      <button class="page-btn" id="pg-prev" ${isFirstPage ? 'disabled' : ''}>◀ Prev</button>
+      <div class="page-counter">Page <strong>${pageIndex + 1}</strong> / ${allPages.length}</div>
+      <button class="page-btn" id="pg-next" ${isLastPage ? 'disabled' : ''}>Next ▶</button>
+    </div>`;
+
+  if (isLastPage) {
+    navHtml += `
+      <div class="chapter-nav" style="margin-top:24px">
+        ${prevEntry
+          ? `<a class="nav-chapter-btn" href="chapter.html?h=${entry.prev}">
+              <div class="nav-label">◀ Previous</div>
+              <div class="nav-ch-title">Ch. ${prevEntry.chapter}</div>
+             </a>`
+          : `<span class="nav-chapter-btn disabled"><div class="nav-label">◀ Previous</div><div class="nav-ch-title">First Chapter</div></span>`
+        }
+        <a class="nav-chapter-btn" href="series.html?id=${entry.series}" style="text-align:center">
+          <div class="nav-label">≡</div>
+          <div class="nav-ch-title">All Chapters</div>
+        </a>
+        ${nextEntry && (!nextEntry.locked || isUnlocked(nextEntry))
+          ? `<a class="nav-chapter-btn" href="chapter.html?h=${entry.next}">
+              <div class="nav-label">Next ▶</div>
+              <div class="nav-ch-title">Ch. ${nextEntry.chapter}</div>
+             </a>`
+          : nextEntry && nextEntry.locked && !isUnlocked(nextEntry)
+          ? `<span class="nav-chapter-btn locked-btn" onclick="showAdwall('${entry.next}')">
+              <div class="nav-label">Next ▶</div>
+              <div class="nav-ch-title">Ch. ${nextEntry.chapter} <span class="locked-tag">FREE</span></div>
+             </span>`
+          : `<span class="nav-chapter-btn disabled"><div class="nav-label">Next ▶</div><div class="nav-ch-title">Latest</div></span>`
+        }
+      </div>`;
+  }
+
+  const wrap = document.querySelector('.chapter-wrap');
+  wrap.innerHTML = `<div class="page-view">${bodyHtml}</div>${navHtml}`;
+
+  if (isFirstPage) {
+    fetch('data/series.json').then(r=>r.json()).then(series => {
+      const s = series.find(s=>s.id === entry.series);
+      const el = document.getElementById('series-breadcrumb');
+      if (s && el) el.innerHTML = `<a href="series.html?id=${entry.series}" style="color:var(--text3);text-decoration:none">${s.title}</a>`;
+    }).catch(()=>{});
+  }
+
+  document.getElementById('pg-prev').onclick = () => {
+    if (currentPage > 0) { window.scrollTo(0,0); renderPage(currentPage - 1); }
+  };
+  document.getElementById('pg-next').onclick = () => {
+    if (currentPage < allPages.length - 1) { window.scrollTo(0,0); renderPage(currentPage + 1); }
+  };
+
+  applyFontSize();
+}
+
 function renderChapter() {
   const d = chapterData;
   const entry = currentEntry;
-
-  // ── CSS Obfuscation helpers ──────────────────────────────────
-  // Injects invisible junk spans between every word so reader-mode
-  // extensions and scrapers extract garbled text, while real readers
-  // see the page normally (junk is display:none / zero-size / aria-hidden).
-  const JUNK_POOL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  function randJunk(len) {
-    let s = '';
-    for (let i = 0; i < len; i++)
-      s += JUNK_POOL[Math.floor(Math.random() * JUNK_POOL.length)];
-    return s;
-  }
-
-  // Wraps a plain-text paragraph string into obfuscated HTML.
-  // Each word gets a hidden junk span injected after it.
-  // Three techniques are layered so no single extension strips them all:
-  //   1. aria-hidden="true"  — ignored by screen readers
-  //   2. style="display:none" — invisible to eyes, present in DOM text
-  //   3. font-size:0;color:transparent — present visually but zero-size
-  function obfuscatePara(text) {
-    const esc = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const words = esc.split(' ');
-    return words.map((word, i) => {
-      if (!word) return '';
-      // Alternate between two junk span styles so pattern-matchers can't strip one class
-      const style = i % 2 === 0
-        ? `display:none`
-        : `font-size:0;color:transparent;position:absolute`;
-      const junk = randJunk(4 + Math.floor(Math.random() * 5));
-      return `${word}<span aria-hidden="true" style="${style}" class="_jnk">${junk}</span>`;
-    }).join(' ');
-  }
-
-  // Detect code blocks (lines starting with >/space or containing {})
-  function processContent(paragraphs) {
-    let html = '';
-    let codeBuffer = [];
-    let inCode = false;
-
-    paragraphs.forEach(para => {
-      // Illustration support: lines starting with [img] render as full-width images
-      if (para.startsWith('[img]')) {
-        if (inCode) { html += `<pre>${codeBuffer.join('\n')}</pre>`; codeBuffer = []; inCode = false; }
-        const url = para.slice(5).trim();
-        html += `<figure class="chapter-illustration"><img src="${url}" alt="Illustration" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>`;
-        return;
-      }
-      const isCode = para.startsWith('>') || para.startsWith('spell ') || para.startsWith('//') || para.startsWith('NAME:') || para.startsWith('SYSTEM');
-      if (isCode) {
-        // Code blocks are not obfuscated — they're system/spell text, keep readable
-        codeBuffer.push(para.replace(/</g,'&lt;').replace(/>/g,'&gt;'));
-        inCode = true;
-      } else {
-        if (inCode) { html += `<pre>${codeBuffer.join('\n')}</pre>`; codeBuffer = []; inCode = false; }
-        // Wrap paragraph in obfuscated spans
-        html += `<p>${obfuscatePara(para)}</p>`;
-      }
-    });
-    if (codeBuffer.length) html += `<pre>${codeBuffer.join('\n')}</pre>`;
-    return html;
-  }
-
+  const prevEntry = entry.prev ? hashmapData[entry.prev] : null;
   document.title = `${d.title} — RanobeVault`;
   document.getElementById('top-title').textContent = d.title;
 
-  // Build paginated pages from content
+  // Build pages and create shell
   allPages = buildPages(d.content || []);
-
-  // Set up the chapter-wrap shell (renderPage fills the inside)
-  const content = document.getElementById('content');
-  content.innerHTML = `<div class="chapter-wrap"></div>`;
+  document.getElementById('content').innerHTML = `<div class="chapter-wrap"></div>`;
 
   setupProgress();
 
-  // Restore saved page position
+  // Restore saved page or start at 0
   const savedPage = parseInt(localStorage.getItem(`pos_${hash}`) || '0');
-  const startPage = (savedPage > 0 && savedPage < allPages.length) ? savedPage : 0;
-  renderPage(startPage);
+  renderPage((savedPage > 0 && savedPage < allPages.length) ? savedPage : 0);
 }
 
 function showAdwall(targetHash) {
@@ -651,121 +728,9 @@ function saveProgress() {
   localStorage.setItem(`read_${hash}`, '1');
 }
 
-// ── Pagination state ─────────────────────────────────────────
-let allPages = [];    // array of paragraph arrays
-let currentPage = 0;
-const PARAS_PER_PAGE = 8; // tune: ~8 paragraphs per page
-
-function buildPages(paragraphs) {
-  // Split paragraphs into pages, keeping code blocks together
-  const pages = [];
-  let buf = [];
-  paragraphs.forEach(para => {
-    buf.push(para);
-    // page break after PARAS_PER_PAGE non-code paras
-    const nonCode = buf.filter(p => !p.startsWith('>') && !p.startsWith('//') && !p.startsWith('NAME:') && !p.startsWith('SYSTEM') && !p.startsWith('spell ') && !p.startsWith('[img]'));
-    if (nonCode.length >= PARAS_PER_PAGE) {
-      pages.push([...buf]);
-      buf = [];
-    }
-  });
-  if (buf.length) pages.push(buf);
-  return pages;
-}
-
-function renderPage(pageIndex) {
-  currentPage = pageIndex;
-  const pageData = allPages[pageIndex];
-  const entry = currentEntry;
-  const d = chapterData;
-  const prevEntry = entry.prev ? hashmapData[entry.prev] : null;
-  const nextEntry = entry.next ? hashmapData[entry.next] : null;
-  const isLastPage = pageIndex === allPages.length - 1;
-  const isFirstPage = pageIndex === 0;
-
-  // Update progress bar
-  const bar = document.getElementById('progress');
-  if (bar) bar.style.width = allPages.length <= 1 ? '100%' : ((pageIndex / (allPages.length - 1)) * 100) + '%';
-
-  // Save page position
-  localStorage.setItem(`pos_${hash}`, pageIndex);
-
-  // Build page HTML
-  let bodyHtml = '';
-  if (isFirstPage) {
-    bodyHtml += `
-      <div class="chapter-header">
-        <div class="chapter-series" id="series-breadcrumb">Loading series...</div>
-        <h1 class="chapter-title">${escHtml(d.title)}</h1>
-        <div class="chapter-divider"><span>✦ ✦ ✦</span></div>
-      </div>`;
-  }
-  bodyHtml += `<div class="chapter-body">${processContent(pageData)}</div>`;
-
-  // Bottom nav: page controls on all pages, chapter nav only on last page
-  let navHtml = `
-    <div class="page-nav">
-      <button class="page-btn" id="pg-prev" ${isFirstPage ? 'disabled' : ''}>◀ Prev</button>
-      <div class="page-counter">Page <strong>${pageIndex + 1}</strong> / ${allPages.length}</div>
-      <button class="page-btn" id="pg-next">${isLastPage ? 'End ▶' : 'Next ▶'}</button>
-    </div>`;
-
-  if (isLastPage) {
-    navHtml += `
-      <div class="chapter-nav" style="margin-top:24px">
-        ${prevEntry
-          ? `<a class="nav-chapter-btn" href="chapter.html?h=${entry.prev}">
-              <div class="nav-label">◀ Previous</div>
-              <div class="nav-ch-title">Ch. ${prevEntry.chapter}</div>
-             </a>`
-          : `<span class="nav-chapter-btn disabled"><div class="nav-label">◀ Previous</div><div class="nav-ch-title">First Chapter</div></span>`
-        }
-        <a class="nav-chapter-btn" href="series.html?id=${entry.series}" style="text-align:center">
-          <div class="nav-label">≡</div>
-          <div class="nav-ch-title">All Chapters</div>
-        </a>
-        ${nextEntry && (!nextEntry.locked || isUnlocked(nextEntry))
-          ? `<a class="nav-chapter-btn" href="chapter.html?h=${entry.next}">
-              <div class="nav-label">Next ▶</div>
-              <div class="nav-ch-title">Ch. ${nextEntry.chapter}</div>
-             </a>`
-          : nextEntry && nextEntry.locked && !isUnlocked(nextEntry)
-          ? `<span class="nav-chapter-btn locked-btn" onclick="showAdwall('${entry.next}')">
-              <div class="nav-label">Next ▶</div>
-              <div class="nav-ch-title">Ch. ${nextEntry.chapter} <span class="locked-tag">FREE</span></div>
-             </span>`
-          : `<span class="nav-chapter-btn disabled"><div class="nav-label">Next ▶</div><div class="nav-ch-title">Latest</div></span>`
-        }
-      </div>`;
-  }
-
-  const wrap = document.querySelector('.chapter-wrap');
-  wrap.innerHTML = `<div class="page-view">${bodyHtml}</div>${navHtml}`;
-
-  // Re-attach series breadcrumb if first page
-  if (isFirstPage) {
-    fetch('data/series.json').then(r=>r.json()).then(series => {
-      const s = series.find(s=>s.id === entry.series);
-      const el = document.getElementById('series-breadcrumb');
-      if (s && el) el.innerHTML = `<a href="series.html?id=${entry.series}" style="color:var(--text3);text-decoration:none">${s.title}</a>`;
-    }).catch(()=>{});
-  }
-
-  // Wire up page buttons
-  document.getElementById('pg-prev').onclick = () => {
-    if (currentPage > 0) { window.scrollTo(0,0); renderPage(currentPage - 1); }
-  };
-  document.getElementById('pg-next').onclick = () => {
-    if (currentPage < allPages.length - 1) { window.scrollTo(0,0); renderPage(currentPage + 1); }
-    // On last page, "End" does nothing extra — chapter nav is visible below
-  };
-
-  applyFontSize();
-}
-
 function setupProgress() {
-  // Pagination replaces scroll progress — bar is driven by page index in renderPage()
-  // Keyboard left/right navigation
+  // Progress bar is driven by page index in renderPage() — no scroll listener needed.
+  // Keyboard arrow navigation
   document.addEventListener('keydown', function(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
@@ -774,8 +739,7 @@ function setupProgress() {
       if (currentPage > 0) { window.scrollTo(0,0); renderPage(currentPage - 1); }
     }
   });
-
-  // Touch swipe support
+  // Touch swipe
   let touchStartX = 0;
   document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
   document.addEventListener('touchend', e => {
