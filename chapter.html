@@ -154,13 +154,7 @@
   }
 
   /* Tap zones — invisible left/right overlays for page turning */
-  .tap-zone {
-    position: absolute; top: 0; bottom: 0;
-    width: 30%; z-index: 10;
-    cursor: pointer;
-  }
-  .tap-zone-left  { left: 0; }
-  .tap-zone-right { right: 0; }
+  .tap-zone { display: none; } /* replaced by touch handler on page-view */
 
   /* The visible page content area */
   .page-view {
@@ -798,8 +792,6 @@ function renderPage(pageIndex) {
 
   const wrap = document.querySelector('.chapter-wrap');
   wrap.innerHTML = `
-    <div class="tap-zone tap-zone-left"  id="tap-prev"></div>
-    <div class="tap-zone tap-zone-right" id="tap-next"></div>
     <div class="page-header">
       ${!isFirstPage ? `<button class="page-jump-btn" id="pg-top-prev">↑ Prev</button>` : `<span></span>`}
       <div class="page-pip-counter">
@@ -819,13 +811,30 @@ function renderPage(pageIndex) {
       <div class="page-counter">Page <strong>${pageIndex + 1}</strong> / ${allPages.length}</div>
     </div>`;
 
-  // Tap zone handlers
-  document.getElementById('tap-prev').onclick = () => {
-    if (currentPage > 0) renderPage(currentPage - 1);
-  };
-  document.getElementById('tap-next').onclick = () => {
-    if (currentPage < allPages.length - 1) renderPage(currentPage + 1);
-  };
+  // Tap detection on page-view: short tap with minimal movement = page turn.
+  // Left 30% = prev, right 30% = next. Center 40% = ignored (text selection area).
+  // Scroll events are unaffected since we only act on touchend with no movement.
+  const pv = wrap.querySelector('.page-view');
+  if (pv) {
+    let tapStartX = 0, tapStartY = 0, tapStartScroll = 0;
+    pv.addEventListener('touchstart', e => {
+      tapStartX = e.touches[0].clientX;
+      tapStartY = e.touches[0].clientY;
+      tapStartScroll = pv.scrollTop;
+    }, { passive: true });
+    pv.addEventListener('touchend', e => {
+      const dx = Math.abs(e.changedTouches[0].clientX - tapStartX);
+      const dy = Math.abs(e.changedTouches[0].clientY - tapStartY);
+      const scrolled = Math.abs(pv.scrollTop - tapStartScroll);
+      // Only act if it was a genuine tap: barely moved finger, no scroll happened
+      if (dx < 12 && dy < 12 && scrolled < 8) {
+        const xPct = tapStartX / window.innerWidth;
+        if (xPct < 0.30 && currentPage > 0) renderPage(currentPage - 1);
+        else if (xPct > 0.70 && currentPage < allPages.length - 1) renderPage(currentPage + 1);
+      }
+    }, { passive: true });
+  }
+
   // Top bar prev/next buttons
   const topPrev = document.getElementById('pg-top-prev');
   const topNext = document.getElementById('pg-top-next');
