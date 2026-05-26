@@ -227,6 +227,15 @@
     "file": "WBqIjgWo1.json",
     "locked": false,
     "prev": "9rDTOG3Ff",
+    "next": "4JIWxk0A9"
+  },
+  "4JIWxk0A9": {
+    "series": "life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "volume": 1,
+    "chapter": 6,
+    "file": "4JIWxk0A9.json",
+    "locked": false,
+    "prev": "WBqIjgWo1",
     "next": null
   }
 }
