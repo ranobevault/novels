@@ -156,22 +156,18 @@
   /* Tap zones — invisible left/right overlays for page turning */
   .tap-zone { display: none; } /* replaced by touch handler on page-view */
 
-  /* The visible page content area */
+  /* The visible page content area — no scroll, fits viewport exactly */
   .page-view {
     flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 20px 24px 12px;
+    overflow: hidden;
+    padding: 20px 24px 8px;
     max-width: 680px;
     width: 100%;
     margin: 0 auto;
     animation: pageFadeIn 0.18s ease;
-    min-height: 0; /* critical: allows flex child to shrink below content size */
-    /* Hide scrollbar visually — scrolling still works, just invisible */
-    scrollbar-width: none;        /* Firefox */
-    -ms-overflow-style: none;     /* IE/Edge */
+    min-height: 0;
+    box-sizing: border-box;
   }
-  .page-view::-webkit-scrollbar { display: none; } /* Chrome/Safari */
   @keyframes pageFadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
@@ -181,33 +177,28 @@
   .page-header {
     flex-shrink: 0;
     display: flex; align-items: center; justify-content: space-between;
-    gap: 10px; padding: 6px 16px;
+    gap: 10px; padding: 5px 16px;
     border-bottom: 1px solid var(--border);
     max-width: 680px; width: 100%; margin: 0 auto;
   }
   /* Pip dot row */
   .page-pip-counter {
     display: flex; align-items: center; gap: 5px;
-    flex: 1; justify-content: center; flex-wrap: wrap;
+    flex: 1; flex-wrap: wrap;
   }
   .pip {
     width: 5px; height: 5px; border-radius: 50%;
     background: var(--border); flex-shrink: 0;
     transition: background 0.2s, transform 0.2s;
   }
-  .pip-active {
-    background: var(--accent); transform: scale(1.5);
-  }
-  /* Top prev/next mini buttons */
-  .page-jump-btn {
-    background: none; border: none;
-    color: var(--text3); font-size: 0.72rem;
-    cursor: pointer; padding: 2px 6px;
-    font-family: 'Lato', sans-serif;
+  .pip-active { background: var(--accent); transform: scale(1.5); }
+  .pip-ellipsis { opacity: 0.4; }
+  /* Minimal page number on right */
+  .page-label {
+    font-size: 0.68rem; color: var(--text3);
     white-space: nowrap; flex-shrink: 0;
-    transition: color 0.2s;
+    letter-spacing: 0.05em;
   }
-  .page-jump-btn:hover { color: var(--accent); }
 
   /* Bottom bar: page counter pinned to bottom */
   .page-footer {
@@ -697,34 +688,50 @@ function calcParasPerPage() {
 }
 
 function buildPages(paragraphs) {
-  // Target ~1200 chars per page on mobile, scaling with screen width.
-  // This prevents short-paragraph chapters from leaving huge empty space,
-  // and stops long-paragraph chapters from overflowing too much.
-  const baseChars = 1200;
-  const widthScale = Math.min(1.6, window.innerWidth / 390); // scale up slightly on wider screens
-  const charBudget = Math.round(baseChars * widthScale);
+  // Calculate available reading height in pixels:
+  //   total viewport - top bar (54px) - page-header (~34px) - page-footer (~44px) - padding (28px)
+  const topBar     = 54;
+  const pageHeader = 34;
+  const pageFooter = 44;
+  const padding    = 28;
+  const availH = window.innerHeight - topBar - pageHeader - pageFooter - padding;
+
+  // Estimate how many characters fit per line based on viewport width and font size.
+  // Font size is stored in `fontSize` (default 16px), line-height 1.85.
+  const fs = typeof fontSize !== 'undefined' ? fontSize : 16;
+  const lineH       = fs * 1.85;           // px per line
+  const charsPerLine = Math.floor((Math.min(window.innerWidth, 680) - 48) / (fs * 0.52));
+  const paraMargin  = fs * 1.4;            // margin-bottom between paragraphs
+
+  // Estimate pixel height of a paragraph given its text length
+  function paraHeight(text) {
+    if (text.startsWith('[img]')) return Math.min(window.innerWidth * 0.75, 320); // illustration estimate
+    const isCode = text.startsWith('>') || text.startsWith('//') ||
+      text.startsWith('NAME:') || text.startsWith('SYSTEM') || text.startsWith('spell ');
+    const lines = isCode
+      ? text.split('\n').length
+      : Math.ceil(text.length / charsPerLine) || 1;
+    return (lines * lineH) + paraMargin;
+  }
 
   const pages = [];
   let buf = [];
-  let charCount = 0;
+  let usedH = 0;
 
   paragraphs.forEach(para => {
-    const isCode = para.startsWith('>') || para.startsWith('//') ||
-      para.startsWith('NAME:') || para.startsWith('SYSTEM') ||
-      para.startsWith('spell ') || para.startsWith('[img]');
-
-    buf.push(para);
-    if (!isCode) charCount += para.length;
-
-    // Flush when we've hit the budget, but always keep at least 2 real paras
+    const h = paraHeight(para);
     const realParas = buf.filter(p =>
       !p.startsWith('>') && !p.startsWith('//') && !p.startsWith('NAME:') &&
       !p.startsWith('SYSTEM') && !p.startsWith('spell ') && !p.startsWith('[img]'));
 
-    if (charCount >= charBudget && realParas.length >= 2) {
+    // If adding this paragraph would overflow AND we already have content, flush
+    if (usedH + h > availH && realParas.length >= 1) {
       pages.push([...buf]);
-      buf = [];
-      charCount = 0;
+      buf = [para];
+      usedH = h;
+    } else {
+      buf.push(para);
+      usedH += h;
     }
   });
   if (buf.length) pages.push(buf);
@@ -791,20 +798,30 @@ function renderPage(pageIndex) {
   }
 
   const wrap = document.querySelector('.chapter-wrap');
+  // Build pip dots — cap at 20, show condensed "..." beyond that
+  const MAX_PIPS = 20;
+  const total = allPages.length;
+  let pipsHtml = '';
+  if (total <= MAX_PIPS) {
+    pipsHtml = Array.from({length: total}, (_, i) =>
+      `<span class="pip${i === pageIndex ? ' pip-active' : ''}"></span>`
+    ).join('');
+  } else {
+    // Show: first, ..., current-1, current, current+1, ..., last
+    for (let i = 0; i < total; i++) {
+      const near = Math.abs(i - pageIndex) <= 1 || i === 0 || i === total - 1;
+      const edgeDot = (i === 1 && pageIndex > 2) || (i === total - 2 && pageIndex < total - 3);
+      if (near) {
+        pipsHtml += `<span class="pip${i === pageIndex ? ' pip-active' : ''}"></span>`;
+      } else if (edgeDot) {
+        pipsHtml += `<span class="pip pip-ellipsis"></span>`;
+      }
+    }
+  }
   wrap.innerHTML = `
     <div class="page-header">
-      ${!isFirstPage ? `<button class="page-jump-btn" id="pg-top-prev">↑ Prev</button>` : `<span></span>`}
-      <div class="page-pip-counter">
-        ${Array.from({length: Math.min(allPages.length, 12)}, (_, i) => {
-          if (allPages.length > 12) {
-            // dot condensed: show first, last, current ±1, rest as condensed
-            const show = i === 0 || i === Math.min(allPages.length,12)-1 || Math.abs(i - Math.min(pageIndex, 11)) <= 1;
-            return show ? `<span class="pip${i === Math.min(pageIndex,11) ? ' pip-active' : ''}"></span>` : '';
-          }
-          return `<span class="pip${i === pageIndex ? ' pip-active' : ''}"></span>`;
-        }).join('')}
-      </div>
-      ${!isLastPage ? `<button class="page-jump-btn" id="pg-top-next">↓ Next</button>` : `<span></span>`}
+      <div class="page-pip-counter">${pipsHtml}</div>
+      <div class="page-label">${pageIndex + 1} / ${total}</div>
     </div>
     <div class="page-view${isFirstPage ? ' page-1' : ''}">${bodyHtml}</div>
     <div class="page-footer">
@@ -834,12 +851,6 @@ function renderPage(pageIndex) {
       }
     }, { passive: true });
   }
-
-  // Top bar prev/next buttons
-  const topPrev = document.getElementById('pg-top-prev');
-  const topNext = document.getElementById('pg-top-next');
-  if (topPrev) topPrev.onclick = () => { if (currentPage > 0) renderPage(currentPage - 1); };
-  if (topNext) topNext.onclick = () => { if (currentPage < allPages.length - 1) renderPage(currentPage + 1); };
 
   if (isFirstPage) {
     fetch('data/series.json').then(r=>r.json()).then(series => {
@@ -977,7 +988,7 @@ function saveProgress() {
 }
 
 function setupProgress() {
-  // Keyboard arrow navigation
+  // Keyboard arrow navigation only — no scroll auto-advance
   document.addEventListener('keydown', function(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
@@ -986,39 +997,6 @@ function setupProgress() {
       if (currentPage > 0) renderPage(currentPage - 1);
     }
   });
-
-  // Auto-advance when user scrolls to bottom, auto-prev when scrolled to top.
-  // Uses event delegation on #content since .page-view is re-created each page turn.
-  let cooldown = false;
-  let lastScrollTop = 0;
-  document.getElementById('content').addEventListener('scroll', function(e) {
-    const pv = e.target.closest('.page-view');
-    if (!pv || cooldown) return;
-    const scrollTop = pv.scrollTop;
-    const atBottom = pv.scrollHeight - scrollTop - pv.clientHeight < 8;
-    const atTop = scrollTop === 0 && lastScrollTop === 0; // only if they scrolled up while already at top
-    const scrollingUp = scrollTop < lastScrollTop;
-    lastScrollTop = scrollTop;
-
-    if (atBottom && currentPage < allPages.length - 1) {
-      cooldown = true;
-      setTimeout(() => { cooldown = false; }, 800);
-      renderPage(currentPage + 1);
-      setTimeout(() => {
-        const newPv = document.querySelector('.page-view');
-        if (newPv) newPv.scrollTop = 0;
-      }, 50);
-    } else if (atTop && scrollingUp && currentPage > 0) {
-      cooldown = true;
-      setTimeout(() => { cooldown = false; }, 800);
-      renderPage(currentPage - 1);
-      // Scroll to bottom of previous page so it feels natural
-      setTimeout(() => {
-        const newPv = document.querySelector('.page-view');
-        if (newPv) newPv.scrollTop = newPv.scrollHeight;
-      }, 50);
-    }
-  }, true);
 }
 
 // Settings
