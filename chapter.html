@@ -551,16 +551,17 @@ function obfuscatePara(text) {
   const words = esc.split(' ');
   return words.map((word, i) => {
     if (!word) return '';
-    // Layer 1: homoglyph substitution on the raw word (visually identical, encodes differently)
-    const glyphed = applyHomoglyphs(word);
-    // Layer 2: invisible Unicode poison injected at random position
-    const poisoned = poisonWord(glyphed);
-    // Layer 3: invisible junk span between words (HTML-level noise)
+    // Visible word is completely untouched — renders perfectly on screen.
+    // All poison is stuffed inside display:none / zero-size spans.
+    // Reader mode and scrapers extract the span content too, getting garbage.
     const style = i % 2 === 0
       ? `display:none`
       : `font-size:0;color:transparent;position:absolute`;
-    const junk = randJunk(4 + Math.floor(Math.random() * 5));
-    return `${poisoned}<span aria-hidden="true" style="${style}" class="_jnk">${junk}</span>`;
+    // Span content: random ASCII + invisible Unicode + homoglyph-swapped junk
+    const ascii = randJunk(4 + Math.floor(Math.random() * 5));
+    const poison = poisonChars();
+    const glyphed = applyHomoglyphs(randJunk(3 + Math.floor(Math.random() * 4)));
+    return `${word}<span aria-hidden="true" style="${style}" class="_jnk">${poison}${ascii}${glyphed}</span>`;
   }).join(' ');
 }
 function processContent(paragraphs) {
