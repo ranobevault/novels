@@ -256,6 +256,15 @@
     "file": "4yOZ717Wa.json",
     "locked": false,
     "prev": "LnVu09qm3",
+    "next": "JVIUSyE89"
+  },
+  "JVIUSyE89": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 8,
+    "file": "JVIUSyE89.json",
+    "locked": false,
+    "prev": "4yOZ717Wa",
     "next": null
   }
 }
