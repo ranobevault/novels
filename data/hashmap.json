@@ -265,6 +265,17 @@
     "file": "JVIUSyE89.json",
     "locked": false,
     "prev": "4yOZ717Wa",
-    "next": null
+    "next": "sXye6exNL"
+  },
+  "sXye6exNL": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 9,
+    "file": "sXye6exNL.json",
+    "locked": true,
+    "prev": "JVIUSyE89",
+    "next": null,
+    "adwallUrl": "https://link-hub.net/5798120/mnF6Cqb4JpXq",
+    "unlockKey": "uk_2f2NkLHHFR"
   }
 }
