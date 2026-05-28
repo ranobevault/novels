@@ -153,14 +153,11 @@
     display: flex; flex-direction: column;
   }
 
-  /* Tap zones — invisible left/right overlays for page turning */
-  .tap-zone { display: none; } /* replaced by touch handler on page-view */
-
-  /* The visible page content area — no scroll, fits viewport exactly */
+  /* page-view takes remaining space after header */
   .page-view {
     flex: 1;
     overflow: hidden;
-    padding: 20px 24px 8px;
+    padding: 12px 22px 28px; /* bottom pad so text stays above floating indicator */
     max-width: 680px;
     width: 100%;
     margin: 0 auto;
@@ -200,19 +197,20 @@
     letter-spacing: 0.05em;
   }
 
-  /* Bottom bar: page counter pinned to bottom */
+  /* Bottom page indicator — floating, transparent, bottom-right */
   .page-footer {
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    gap: 16px; padding: 10px 24px;
-    border-top: 1px solid var(--border);
-    max-width: 680px; width: 100%; margin: 0 auto;
+    position: absolute;
+    bottom: 8px; right: 14px;
+    z-index: 20;
+    pointer-events: none; /* never blocks taps */
   }
   .page-counter {
-    font-size: 0.75rem; color: var(--text3);
-    letter-spacing: 0.1em; text-align: center;
+    font-size: 0.68rem;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    opacity: 0.75;
   }
-  .page-counter strong { color: var(--accent); font-size: 0.85rem; }
+  .page-counter strong { color: var(--accent); }
 
   /* Hide old nav buttons — tap zones replace them */
   .page-nav { display: none; }
@@ -240,10 +238,10 @@
   .chapter-divider span { font-size: 0.7rem; letter-spacing: 0.15em; }
 
   .chapter-illustration {
-    margin: 1em 0; text-align: center;
+    margin: 0.5em 0; text-align: center;
   }
   .chapter-illustration img {
-    max-width: 100%; max-height: 40vh;
+    max-width: 100%; max-height: 38vh;
     object-fit: contain; border-radius: 4px;
     display: block; margin: 0 auto;
   }
@@ -253,7 +251,7 @@
     font-size: var(--font-size);
     line-height: var(--line-height);
     color: var(--reader-text);
-    margin-bottom: 1.1em;
+    margin-bottom: 0.7em;
     text-align: justify;
     transition: font-size 0.2s, color 0.3s;
   }
@@ -699,9 +697,9 @@ function buildPages(paragraphs) {
   // Estimate how many characters fit per line based on viewport width and font size.
   // Font size is stored in `fontSize` (default 16px), line-height 1.85.
   const fs = typeof fontSize !== 'undefined' ? fontSize : 16;
-  const lineH       = fs * 1.85;           // px per line
-  const charsPerLine = Math.floor((Math.min(window.innerWidth, 680) - 48) / (fs * 0.52));
-  const paraMargin  = fs * 1.4;            // margin-bottom between paragraphs
+  const lineH        = fs * 1.85;
+  const charsPerLine = Math.floor((Math.min(window.innerWidth, 680) - 44) / (fs * 0.52));
+  const paraMargin   = fs * 0.7; // matches margin-bottom: 0.7em
 
   // Estimate pixel height of a paragraph given its text length
   function paraHeight(text) {
@@ -738,6 +736,34 @@ function buildPages(paragraphs) {
   return pages;
 }
 
+// ── Page preload cache ────────────────────────────────────────────────────────
+// Pre-renders adjacent pages into a Map so renderPage can swap instantly.
+// Images in preloaded pages are also fetched by the browser cache automatically.
+const pageCache = new Map();
+
+function preloadPage(pageIndex) {
+  if (pageIndex < 0 || pageIndex >= allPages.length) return;
+  if (pageCache.has(pageIndex)) return; // already cached
+  // Build HTML off-screen — processContent is pure, no DOM side effects
+  const html = processContent(allPages[pageIndex]);
+  pageCache.set(pageIndex, html);
+  // Trigger image preload for any [img] paragraphs on this page
+  allPages[pageIndex].forEach(para => {
+    if (para.startsWith('[img]')) {
+      const url = para.slice(5).trim();
+      const img = new Image();
+      img.src = url;
+    }
+  });
+}
+
+function preloadAdjacent(pageIndex) {
+  // Preload next 2 and prev 1 pages
+  preloadPage(pageIndex + 1);
+  preloadPage(pageIndex + 2);
+  preloadPage(pageIndex - 1);
+}
+
 function renderPage(pageIndex) {
   currentPage = pageIndex;
   const pageData = allPages[pageIndex];
@@ -755,7 +781,7 @@ function renderPage(pageIndex) {
   // Save page position
   localStorage.setItem(`pos_${hash}`, pageIndex);
 
-  // Build page body
+  // Build page body — use preloaded cache if available
   let bodyHtml = '';
   if (isFirstPage) {
     bodyHtml += `
@@ -765,7 +791,9 @@ function renderPage(pageIndex) {
         <div class="chapter-divider"><span>✦ ✦ ✦</span></div>
       </div>`;
   }
-  bodyHtml += `<div class="chapter-body">${processContent(pageData)}</div>`;
+  const cachedBody = pageCache.get(pageIndex);
+  bodyHtml += `<div class="chapter-body">${cachedBody || processContent(pageData)}</div>`;
+  if (!cachedBody) pageCache.set(pageIndex, processContent(pageData)); // cache for next visit
 
   // Last page: show chapter nav inside the scrollable page view
   if (isLastPage) {
@@ -860,10 +888,11 @@ function renderPage(pageIndex) {
     }).catch(()=>{});
   }
 
+  // Preload adjacent pages in background after current page is rendered
+  setTimeout(() => preloadAdjacent(pageIndex), 100);
+
   applyFontSize();
 }
-
-function renderChapter() {
   const d = chapterData;
   const entry = currentEntry;
   const prevEntry = entry.prev ? hashmapData[entry.prev] : null;
@@ -1024,13 +1053,13 @@ function applyMode() {
 document.getElementById('font-inc').onclick = () => {
   if (fontSize < 24) {
     fontSize++; applyFontSize(); localStorage.setItem('reader_fontsize', fontSize);
-    if (chapterData) { allPages = buildPages(chapterData.content || []); renderPage(0); }
+    if (chapterData) { pageCache.clear(); allPages = buildPages(chapterData.content || []); renderPage(0); }
   }
 };
 document.getElementById('font-dec').onclick = () => {
   if (fontSize > 13) {
     fontSize--; applyFontSize(); localStorage.setItem('reader_fontsize', fontSize);
-    if (chapterData) { allPages = buildPages(chapterData.content || []); renderPage(0); }
+    if (chapterData) { pageCache.clear(); allPages = buildPages(chapterData.content || []); renderPage(0); }
   }
 };
 document.getElementById('mode-toggle').onclick = () => { isLight = !isLight; applyMode(); localStorage.setItem('reader_light', isLight ? '1' : '0'); };
