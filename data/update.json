@@ -1,5 +1,13 @@
 [
   {
+    "series_id": "childhood-friends-became-popular-idols",
+    "title": "Childhood Friends Became Popular Idols",
+    "cover": "https://ranobevault.github.io/novels/covers/cover.jpeg",
+    "reason": "Vol.1 Ch.3 added",
+    "url": "series.html?id=childhood-friends-became-popular-idols",
+    "timestamp": "2026-05-28T12:42:51.703Z"
+  },
+  {
     "series_id": "valkyrie-bullet",
     "title": "Valkyrie Bullet",
     "cover": "https://i.imgur.com/b6Vd69k.jpeg",
@@ -150,13 +158,5 @@
     "reason": "Vol.1 Ch.1 added",
     "url": "series.html?id=life-as-an-adventurer-with-the-banished-marquis-daughter",
     "timestamp": "2026-05-21T11:54:43.919Z"
-  },
-  {
-    "series_id": "life-as-an-adventurer-with-the-banished-marquis-daughter",
-    "title": "Life as an Adventurer with the Banished Marquis’ Daughter",
-    "cover": "https://ranobevault.github.io/novels/covers/cover.jpg",
-    "reason": "Volume 1 Chapter 1 added",
-    "url": "series.html?id=life-as-an-adventurer-with-the-banished-marquis-daughter",
-    "timestamp": "2026-05-21T11:22:35.838Z"
   }
 ]
