@@ -401,6 +401,15 @@
     "file": "HFQ8W1IgG.json",
     "locked": false,
     "prev": "sXye6exNL",
+    "next": "xxTPnZhbF"
+  },
+  "xxTPnZhbF": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 11,
+    "file": "xxTPnZhbF.json",
+    "locked": false,
+    "prev": "HFQ8W1IgG",
     "next": null
   }
 }
