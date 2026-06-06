@@ -3,6 +3,14 @@
     "series_id": "valkyrie-bullet",
     "title": "Valkyrie Bullet",
     "cover": "https://i.imgur.com/b6Vd69k.jpeg",
+    "reason": "Vol.1 Ch.12 added",
+    "url": "series.html?id=valkyrie-bullet",
+    "timestamp": "2026-06-06T02:07:55.775Z"
+  },
+  {
+    "series_id": "valkyrie-bullet",
+    "title": "Valkyrie Bullet",
+    "cover": "https://i.imgur.com/b6Vd69k.jpeg",
     "reason": "Vol.1 Ch.11 added",
     "url": "series.html?id=valkyrie-bullet",
     "timestamp": "2026-06-06T02:02:11.059Z"
@@ -150,13 +158,5 @@
     "reason": "Vol.1 Ch.6 added",
     "url": "series.html?id=life-as-an-adventurer-with-the-banished-marquis-daughter",
     "timestamp": "2026-05-26T14:12:05.087Z"
-  },
-  {
-    "series_id": "life-as-an-adventurer-with-the-banished-marquis-daughter",
-    "title": "Life as an Adventurer with the Banished Marquis’ Daughter",
-    "cover": "https://ranobevault.github.io/novels/covers/cover.jpg",
-    "reason": "Vol.1 Ch.5 added",
-    "url": "series.html?id=life-as-an-adventurer-with-the-banished-marquis-daughter",
-    "timestamp": "2026-05-26T14:10:01.018Z"
   }
 ]
