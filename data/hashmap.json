@@ -274,7 +274,7 @@
     "file": "sXye6exNL.json",
     "locked": true,
     "prev": "JVIUSyE89",
-    "next": null,
+    "next": "HFQ8W1IgG",
     "adwallUrl": "https://link-hub.net/5798120/mnF6Cqb4JpXq",
     "unlockKey": "uk_2f2NkLHHFR"
   },
@@ -393,5 +393,14 @@
     "next": null,
     "adwallUrl": "https://link-target.net/5798120/cVOKLTHPQZ7p",
     "unlockKey": "uk_ehh9jwPJf5"
+  },
+  "HFQ8W1IgG": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 10,
+    "file": "HFQ8W1IgG.json",
+    "locked": false,
+    "prev": "sXye6exNL",
+    "next": null
   }
 }
