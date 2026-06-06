@@ -410,6 +410,17 @@
     "file": "xxTPnZhbF.json",
     "locked": false,
     "prev": "HFQ8W1IgG",
-    "next": null
+    "next": "41tZn0Hj4"
+  },
+  "41tZn0Hj4": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 12,
+    "file": "41tZn0Hj4.json",
+    "locked": true,
+    "prev": "xxTPnZhbF",
+    "next": null,
+    "adwallUrl": "https://link-hub.net/5798120/9nzQTJHvrLci",
+    "unlockKey": "uk_6Qd9pBHVNE"
   }
 }
