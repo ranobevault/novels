@@ -479,6 +479,17 @@
     "file": "IMSJYbwWJ.json",
     "locked": false,
     "prev": "qlvH9KNwK",
-    "next": null
+    "next": "jHOOj3Ngg"
+  },
+  "jHOOj3Ngg": {
+    "series": "life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "volume": 1,
+    "chapter": 13,
+    "file": "jHOOj3Ngg.json",
+    "locked": true,
+    "prev": "IMSJYbwWJ",
+    "next": null,
+    "adwallUrl": "https://link-target.net/5798120/iiKVtVLcOf1i",
+    "unlockKey": "uk_ewhNyyHYWG"
   }
 }
