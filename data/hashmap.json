@@ -361,7 +361,7 @@
     "file": "vC63Es2rq.json",
     "locked": true,
     "prev": "cXerajAuF",
-    "next": null,
+    "next": "qlvH9KNwK",
     "adwallUrl": "https://link-target.net/5798120/ODSl5ch8kdl0",
     "unlockKey": "uk_chznugG9np"
   },
@@ -461,6 +461,15 @@
     "locked": true,
     "unlockKey": "uk_H3Ds4p9HqX",
     "prev": "YfCDwJUQV",
+    "next": null
+  },
+  "qlvH9KNwK": {
+    "series": "life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "volume": 1,
+    "chapter": 11,
+    "file": "qlvH9KNwK.json",
+    "locked": false,
+    "prev": "vC63Es2rq",
     "next": null
   }
 }
