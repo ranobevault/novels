@@ -528,6 +528,15 @@
     "file": "GZi5t17dU.json",
     "locked": false,
     "prev": "6IbLRcqof",
+    "next": "TJ1FMqyqq"
+  },
+  "TJ1FMqyqq": {
+    "series": "childhood-friends-became-popular-idols",
+    "volume": 1,
+    "chapter": 10,
+    "file": "TJ1FMqyqq.json",
+    "locked": false,
+    "prev": "GZi5t17dU",
     "next": null
   }
 }
