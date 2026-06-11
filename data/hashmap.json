@@ -390,7 +390,7 @@
     "file": "6IbLRcqof.json",
     "locked": true,
     "prev": "pDzpgqnHo",
-    "next": null,
+    "next": "GZi5t17dU",
     "adwallUrl": "https://link-target.net/5798120/cVOKLTHPQZ7p",
     "unlockKey": "uk_ehh9jwPJf5"
   },
@@ -520,5 +520,14 @@
     "next": null,
     "adwallUrl": "https://link-center.net/5798120/V8RvlIhwuD29",
     "unlockKey": "uk_KnyMny7RKY"
+  },
+  "GZi5t17dU": {
+    "series": "childhood-friends-became-popular-idols",
+    "volume": 1,
+    "chapter": 9,
+    "file": "GZi5t17dU.json",
+    "locked": false,
+    "prev": "6IbLRcqof",
+    "next": null
   }
 }
