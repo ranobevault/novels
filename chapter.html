@@ -927,13 +927,21 @@ function showAdwall(targetHash) {
   const overlay = document.getElementById('adwall');
   const link = document.getElementById('adwall-link');
 
-  if (entry && entry.adwallUrl) {
-    link.href = entry.adwallUrl;
+  // If this entry has no adwallUrl (pair-B side), find the paired A-side that does
+  let adwallUrl = entry?.adwallUrl;
+  if (!adwallUrl && entry?.unlockKey) {
+    const pairedEntry = Object.values(hashmapData).find(
+      e => e.unlockKey === entry.unlockKey && e.adwallUrl
+    );
+    if (pairedEntry) adwallUrl = pairedEntry.adwallUrl;
+  }
+
+  if (adwallUrl) {
+    link.href = adwallUrl;
     link.style.opacity = '1';
     link.style.pointerEvents = 'all';
   } else {
     link.href = '#';
-    link.querySelector ? (link.querySelector('.adwall-btn-icon') || link).textContent : null;
     link.style.opacity = '0.5';
     link.style.pointerEvents = 'none';
   }

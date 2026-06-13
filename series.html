@@ -417,7 +417,16 @@ function handleLocked(hash, title) {
     return;
   }
 
-  if (entry.adwallUrl) window.location.href = entry.adwallUrl;
+  // If this entry has no adwallUrl (pair-B side), find the paired A-side that does
+  let adwallUrl = entry.adwallUrl;
+  if (!adwallUrl && entry.unlockKey && window.cachedHashmap) {
+    const paired = Object.values(window.cachedHashmap).find(
+      e => e.unlockKey === entry.unlockKey && e.adwallUrl
+    );
+    if (paired) adwallUrl = paired.adwallUrl;
+  }
+
+  if (adwallUrl) window.location.href = adwallUrl;
 }
 
 function checkContinue(chapters) {

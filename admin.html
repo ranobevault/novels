@@ -1492,18 +1492,30 @@ async function loadHashmap() {
       tbody.innerHTML = '<tr><td colspan="8" style="color:var(--text3);padding:10px">No entries found</td></tr>';
       return;
     }
-    tbody.innerHTML = Object.entries(data).map(([hash, v]) => `
-      <tr>
+    tbody.innerHTML = Object.entries(data).map(([hash, v]) => {
+      let lockLabel, lockClass;
+      if (!v.locked) {
+        lockLabel = 'Free'; lockClass = 'free';
+      } else if (v.unlocksPair) {
+        lockLabel = v.adwallUrl ? '🔒 Pair-A' : '⚠️ Pair-A (no URL!)'; lockClass = 'locked';
+      } else if (v.locked && !v.adwallUrl && v.unlockKey) {
+        lockLabel = '🔗 Pair-B'; lockClass = 'locked';
+      } else {
+        lockLabel = '🔒 Locked'; lockClass = 'locked';
+      }
+      const missingUrl = v.locked && v.unlocksPair && !v.adwallUrl;
+      return `
+      <tr${missingUrl ? ' style="background:rgba(200,80,80,0.07)"' : ''}>
         <td class="hash-mono">${hash}</td>
         <td>${v.series}</td>
         <td>${v.volume}</td>
         <td>${v.chapter}</td>
         <td class="hash-mono" style="color:var(--text3);font-size:0.72rem">${v.file}</td>
-        <td><span class="lock-pill ${v.locked?'locked':'free'}">${v.locked?'Locked':'Free'}</span></td>
+        <td><span class="lock-pill ${lockClass}">${lockLabel}</span></td>
         <td class="hash-mono" style="font-size:0.7rem;color:var(--text3)">${v.prev||'—'}</td>
         <td class="hash-mono" style="font-size:0.7rem;color:var(--text3)">${v.next||'—'}</td>
-      </tr>
-    `).join('');
+      </tr>`;
+    }).join('');
   } catch(e) { tbody.innerHTML = `<tr><td colspan="8" style="color:var(--red)">Error: ${e.message}</td></tr>`; }
 }
 
@@ -1859,7 +1871,7 @@ async function batchPublish() {
         const partnerSlot = uploadedSlots.find(x => x.pattern.n === p.pairWith);
         const batchPairKey = genUnlockKey();
         entry.locked = true;
-        entry.adwallUrl = s.adwallUrl || '';
+        if (s.adwallUrl) entry.adwallUrl = s.adwallUrl;
         entry.unlockKey = batchPairKey;
         entry.unlocksPair = true;
         entry.next = partnerSlot ? partnerSlot.hash : nextHash;
