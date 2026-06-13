@@ -105,6 +105,20 @@
       "title": "Chapter 15: Luna's Awakening",
       "hash": "5w9ManmiW",
       "locked": false
+    },
+    {
+      "volume": 1,
+      "chapter": 1,
+      "title": "Volume 1 Chapter 1",
+      "hash": "I5QrNEU7L",
+      "locked": true
+    },
+    {
+      "volume": 1,
+      "chapter": 2,
+      "title": "Illustration",
+      "hash": "XsCtkTGhU",
+      "locked": true
     }
   ]
 }
