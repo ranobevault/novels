@@ -546,6 +546,15 @@
     "file": "NDw9adkom.json",
     "locked": false,
     "prev": "41tZn0Hj4",
+    "next": "PZGj0Cx7d"
+  },
+  "PZGj0Cx7d": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 14,
+    "file": "PZGj0Cx7d.json",
+    "locked": false,
+    "prev": "NDw9adkom",
     "next": null
   }
 }
