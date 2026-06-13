@@ -439,7 +439,7 @@
     "file": "5w9ManmiW.json",
     "locked": false,
     "prev": "ejHaxfeO6",
-    "next": null
+    "next": "I5QrNEU7L"
   },
   "qlvH9KNwK": {
     "series": "life-as-an-adventurer-with-the-banished-marquis-daughter",
@@ -527,5 +527,27 @@
     "next": null,
     "adwallUrl": "https://link-target.net/5798120/BXG7yGTN8q7Q",
     "unlockKey": "uk_ENnRsw6cw3"
+  },
+  "I5QrNEU7L": {
+    "series": "reborn-as-an-extra-in-a-magical-girl-anime-i-ll-save-those-girls-but-only-because-i-want-to-see-them-cry",
+    "volume": 1,
+    "chapter": 1,
+    "file": "I5QrNEU7L.json",
+    "locked": true,
+    "adwallUrl": "https://link-target.net/5798120/NXC82G5UyC8v",
+    "unlockKey": "uk_dsupL89X3v",
+    "unlocksPair": true,
+    "prev": "5w9ManmiW",
+    "next": "XsCtkTGhU"
+  },
+  "XsCtkTGhU": {
+    "series": "reborn-as-an-extra-in-a-magical-girl-anime-i-ll-save-those-girls-but-only-because-i-want-to-see-them-cry",
+    "volume": 1,
+    "chapter": 2,
+    "file": "XsCtkTGhU.json",
+    "locked": true,
+    "unlockKey": "uk_dsupL89X3v",
+    "prev": "I5QrNEU7L",
+    "next": null
   }
 }
