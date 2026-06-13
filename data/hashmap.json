@@ -564,8 +564,17 @@
     "file": "Jd5IgBULI.json",
     "locked": true,
     "prev": "PZGj0Cx7d",
-    "next": null,
+    "next": "krZm9rJk4",
     "adwallUrl": "https://link-hub.net/5798120/m1ORcDQ9AP5z",
     "unlockKey": "uk_xp8z9tEDEV"
+  },
+  "krZm9rJk4": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 16,
+    "file": "krZm9rJk4.json",
+    "locked": false,
+    "prev": "Jd5IgBULI",
+    "next": null
   }
 }
