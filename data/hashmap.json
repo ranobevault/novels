@@ -555,6 +555,17 @@
     "file": "PZGj0Cx7d.json",
     "locked": false,
     "prev": "NDw9adkom",
-    "next": null
+    "next": "Jd5IgBULI"
+  },
+  "Jd5IgBULI": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 15,
+    "file": "Jd5IgBULI.json",
+    "locked": true,
+    "prev": "PZGj0Cx7d",
+    "next": null,
+    "adwallUrl": "https://link-hub.net/5798120/m1ORcDQ9AP5z",
+    "unlockKey": "uk_xp8z9tEDEV"
   }
 }
