@@ -419,7 +419,7 @@
     "file": "41tZn0Hj4.json",
     "locked": true,
     "prev": "xxTPnZhbF",
-    "next": null,
+    "next": "NDw9adkom",
     "adwallUrl": "https://link-hub.net/5798120/9nzQTJHvrLci",
     "unlockKey": "uk_6Qd9pBHVNE"
   },
@@ -538,5 +538,14 @@
     "next": null,
     "adwallUrl": "https://link-center.net/5798120/RkHXi9TN6J5X",
     "unlockKey": "uk_2z43WR6Lm2"
+  },
+  "NDw9adkom": {
+    "series": "valkyrie-bullet",
+    "volume": 1,
+    "chapter": 13,
+    "file": "NDw9adkom.json",
+    "locked": false,
+    "prev": "41tZn0Hj4",
+    "next": null
   }
 }
