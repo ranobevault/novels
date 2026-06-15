@@ -602,8 +602,17 @@
     "file": "896LbzBo5.json",
     "locked": true,
     "prev": "r3qTLUMHC",
-    "next": null,
+    "next": "RCNd53Cou",
     "adwallUrl": "https://link-target.net/5798120/Zh6EBv0hGNpJ",
     "unlockKey": "uk_D7zPr9cSJu"
+  },
+  "RCNd53Cou": {
+    "series": "life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "volume": 1,
+    "chapter": 17,
+    "file": "RCNd53Cou.json",
+    "locked": false,
+    "prev": "896LbzBo5",
+    "next": null
   }
 }
