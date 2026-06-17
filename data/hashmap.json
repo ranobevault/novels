@@ -660,6 +660,15 @@
     "file": "T65whqbwG.json",
     "locked": false,
     "prev": "aSvQFHyY1",
+    "next": "YtGJmLhBp"
+  },
+  "YtGJmLhBp": {
+    "series": "dragon-gal-s-nail-artist",
+    "volume": 1,
+    "chapter": 3,
+    "file": "YtGJmLhBp.json",
+    "locked": false,
+    "prev": "T65whqbwG",
     "next": null
   }
 }
