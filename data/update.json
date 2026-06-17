@@ -1,5 +1,13 @@
 [
   {
+    "series_id": "dragon-gal-s-nail-artist",
+    "title": "Dragon Gal's Nail Artist",
+    "cover": "https://picsum.photos/seed/dragon-gal-s-nail-artist/300/420",
+    "reason": "Volume 1 Chapter 1 added",
+    "url": "series.html?id=dragon-gal-s-nail-artist",
+    "timestamp": "2026-06-17T11:19:51.963Z"
+  },
+  {
     "series_id": "the-villainess-who-was-dumped-got-married-into-my-family-a-mob-noble-from-the-frontier-and-turns-out-she-s-an-amazing-capable-wife",
     "title": "The Villainess Who Was Dumped Got Married into My Family, a Mob Noble from the Frontier, and Turns Out, She’s an Amazing Capable Wife?",
     "cover": "https://ranobevault.github.io/novels/covers/cover.jpg",
@@ -150,13 +158,5 @@
     "reason": "Vol.1 Ch.13 added",
     "url": "series.html?id=life-as-an-adventurer-with-the-banished-marquis-daughter",
     "timestamp": "2026-06-08T08:52:27.176Z"
-  },
-  {
-    "series_id": "life-as-an-adventurer-with-the-banished-marquis-daughter",
-    "title": "Life as an Adventurer with the Banished Marquis’ Daughter",
-    "cover": "https://ranobevault.github.io/novels/covers/Life-as-an-Adventurer-with-the-Banished-Marquis-Daughter-LN.jpg",
-    "reason": "Vol.1 Ch.12 added",
-    "url": "series.html?id=life-as-an-adventurer-with-the-banished-marquis-daughter",
-    "timestamp": "2026-06-08T08:32:28.389Z"
   }
 ]
