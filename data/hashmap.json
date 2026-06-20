@@ -689,6 +689,17 @@
     "file": "MgqWl1hfU.json",
     "locked": false,
     "prev": "fWoVgxQJ4",
-    "next": null
+    "next": "qrApBEVrX"
+  },
+  "qrApBEVrX": {
+    "series": "childhood-friends-became-popular-idols",
+    "volume": 1,
+    "chapter": 14,
+    "file": "qrApBEVrX.json",
+    "locked": true,
+    "prev": "MgqWl1hfU",
+    "next": null,
+    "adwallUrl": "https://link-hub.net/5798120/GaBlDImtQIYy",
+    "unlockKey": "uk_jLXzbdmLxr"
   }
 }
