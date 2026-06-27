@@ -3,6 +3,14 @@
     "series_id": "valkyrie-bullet",
     "title": "Valkyrie Bullet",
     "cover": "https://i.imgur.com/b6Vd69k.jpeg",
+    "reason": "Vol.2 Ch.2 added",
+    "url": "series.html?id=valkyrie-bullet",
+    "timestamp": "2026-06-27T09:54:09.263Z"
+  },
+  {
+    "series_id": "valkyrie-bullet",
+    "title": "Valkyrie Bullet",
+    "cover": "https://i.imgur.com/b6Vd69k.jpeg",
     "reason": "Vol.2 Ch.1 added",
     "url": "series.html?id=valkyrie-bullet",
     "timestamp": "2026-06-27T09:46:42.103Z"
@@ -150,13 +158,5 @@
     "reason": "Vol.1 Ch.16 added",
     "url": "series.html?id=valkyrie-bullet",
     "timestamp": "2026-06-13T10:40:00.383Z"
-  },
-  {
-    "series_id": "valkyrie-bullet",
-    "title": "Valkyrie Bullet",
-    "cover": "https://i.imgur.com/b6Vd69k.jpeg",
-    "reason": "Vol.1 Ch.15 added",
-    "url": "series.html?id=valkyrie-bullet",
-    "timestamp": "2026-06-13T10:20:39.908Z"
   }
 ]
