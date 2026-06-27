@@ -583,8 +583,8 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Volume</label>
-            <input class="form-input" id="us-vol" type="number" value="1" min="1">
+            <label>Volume <span id="us-vol-badge" style="display:none;font-size:0.7rem;background:rgba(106,180,224,0.15);color:var(--blue);border:1px solid var(--blue);border-radius:4px;padding:1px 6px;margin-left:4px">new vol</span></label>
+            <input class="form-input" id="us-vol" type="number" value="1" min="1" onchange="onVolChange()">
           </div>
           <div class="form-group">
             <label>Chapter</label>
@@ -1352,7 +1352,32 @@ function onSeriesSelect() {
   if (s) {
     document.getElementById('us-vol').value = s.latest_volume;
     document.getElementById('us-ch').value = (s.latest_chapter || 0) + 1;
+    document.getElementById('us-vol-badge').style.display = 'none';
   }
+  generateUSPreview();
+}
+
+function onVolChange() {
+  const id = document.getElementById('us-series').value;
+  if (!id || !cachedSeries) return;
+  const s = cachedSeries.find(x => x.id === id);
+  if (!s) return;
+  const enteredVol = parseInt(document.getElementById('us-vol').value) || 1;
+  const isNewVol = enteredVol > s.latest_volume;
+  const badge = document.getElementById('us-vol-badge');
+  if (isNewVol) {
+    // New volume — reset chapter to 1
+    document.getElementById('us-ch').value = 1;
+    badge.style.display = 'inline';
+    badge.title = `Series is currently on Vol.${s.latest_volume} — starting a new volume`;
+  } else if (enteredVol === s.latest_volume) {
+    // Same volume — restore expected next chapter
+    document.getElementById('us-ch').value = (s.latest_chapter || 0) + 1;
+    badge.style.display = 'none';
+  } else {
+    badge.style.display = 'none';
+  }
+  generateUSPreview();
 }
 
 async function submitUpdateSeries() {
@@ -1483,6 +1508,22 @@ async function submitUpdateSeries() {
     document.getElementById('us-unlocks-pair').checked = false;
     document.getElementById('us-pair-file-section').style.display = 'none';
     document.getElementById('us-single-file-section').style.display = 'block';
+    document.getElementById('us-vol-badge').style.display = 'none';
+
+    // Refresh the series dropdown so it reflects the new vol/ch immediately
+    if (cachedSeries) {
+      const sIdx2 = cachedSeries.findIndex(s => s.id === seriesId);
+      const latestChNum = isPair ? chNumB : chNumA;
+      if (sIdx2 !== -1 && (vol > cachedSeries[sIdx2].latest_volume || (vol === cachedSeries[sIdx2].latest_volume && latestChNum > cachedSeries[sIdx2].latest_chapter))) {
+        cachedSeries[sIdx2].latest_volume = vol;
+        cachedSeries[sIdx2].latest_chapter = latestChNum;
+      }
+      const sel = document.getElementById('us-series');
+      [...sel.options].forEach(opt => {
+        const s = cachedSeries.find(x => x.id === opt.value);
+        if (s) opt.textContent = `${s.title} (Vol.${s.latest_volume} Ch.${s.latest_chapter})`;
+      });
+    }
     generateUSPreview();
 
   } catch(e) {
