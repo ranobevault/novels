@@ -688,9 +688,21 @@
     <div class="tab-pane" id="tab-hashmap">
       <div class="card">
         <div class="card-title">🗺️ Hash Map Viewer</div>
-        <div style="display:flex;gap:10px;margin-bottom:14px">
+        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
           <button class="btn-sm primary" onclick="loadHashmap()">🔄 Refresh</button>
           <button class="btn-sm danger" onclick="exportHashmap()">💾 Export JSON</button>
+          <span style="color:var(--text3);font-size:0.75rem;margin-left:4px" id="hm-count"></span>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+          <select class="config-input" id="hm-series-filter" onchange="renderHashmap()" style="min-width:180px">
+            <option value="">— All Series —</option>
+          </select>
+          <input class="config-input" id="hm-search" placeholder="Search hash / file…" oninput="renderHashmap()" style="min-width:160px;flex:1">
+          <select class="config-input" id="hm-sort" onchange="renderHashmap()" style="min-width:140px">
+            <option value="series">Sort: Series</option>
+            <option value="vol">Sort: Vol → Ch</option>
+            <option value="hash">Sort: Hash</option>
+          </select>
         </div>
         <div style="overflow-x:auto">
           <table class="hash-table">
@@ -1482,6 +1494,8 @@ async function submitUpdateSeries() {
 }
 
 // ========== HASHMAP VIEWER ==========
+let _hmData = null; // cached hashmap entries: [[hash, obj], ...]
+
 async function loadHashmap() {
   const cfg = getConfig(); if (!cfg) return;
   const tbody = document.getElementById('hash-tbody');
@@ -1490,33 +1504,88 @@ async function loadHashmap() {
     const { data } = await ghGetJSON(cfg, 'data/hashmap.json');
     if (!data || !Object.keys(data).length) {
       tbody.innerHTML = '<tr><td colspan="8" style="color:var(--text3);padding:10px">No entries found</td></tr>';
+      _hmData = null;
       return;
     }
-    tbody.innerHTML = Object.entries(data).map(([hash, v]) => {
-      let lockLabel, lockClass;
-      if (!v.locked) {
-        lockLabel = 'Free'; lockClass = 'free';
-      } else if (v.unlocksPair) {
-        lockLabel = v.adwallUrl ? '🔒 Pair-A' : '⚠️ Pair-A (no URL!)'; lockClass = 'locked';
-      } else if (v.locked && !v.adwallUrl && v.unlockKey) {
-        lockLabel = '🔗 Pair-B'; lockClass = 'locked';
-      } else {
-        lockLabel = '🔒 Locked'; lockClass = 'locked';
-      }
-      const missingUrl = v.locked && v.unlocksPair && !v.adwallUrl;
-      return `
-      <tr${missingUrl ? ' style="background:rgba(200,80,80,0.07)"' : ''}>
-        <td class="hash-mono">${hash}</td>
-        <td>${v.series}</td>
-        <td>${v.volume}</td>
-        <td>${v.chapter}</td>
-        <td class="hash-mono" style="color:var(--text3);font-size:0.72rem">${v.file}</td>
-        <td><span class="lock-pill ${lockClass}">${lockLabel}</span></td>
-        <td class="hash-mono" style="font-size:0.7rem;color:var(--text3)">${v.prev||'—'}</td>
-        <td class="hash-mono" style="font-size:0.7rem;color:var(--text3)">${v.next||'—'}</td>
-      </tr>`;
-    }).join('');
+    _hmData = Object.entries(data);
+    // Populate series filter dropdown
+    const seriesSet = [...new Set(_hmData.map(([,v]) => v.series).filter(Boolean))].sort();
+    const sel = document.getElementById('hm-series-filter');
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">— All Series —</option>' +
+      seriesSet.map(s => `<option value="${s}"${s===prev?' selected':''}>${s}</option>`).join('');
+    renderHashmap();
   } catch(e) { tbody.innerHTML = `<tr><td colspan="8" style="color:var(--red)">Error: ${e.message}</td></tr>`; }
+}
+
+function renderHashmap() {
+  if (!_hmData) return;
+  const tbody = document.getElementById('hash-tbody');
+  const filterSeries = document.getElementById('hm-series-filter').value;
+  const search = (document.getElementById('hm-search').value || '').toLowerCase().trim();
+  const sortBy = document.getElementById('hm-sort').value;
+
+  let entries = _hmData;
+
+  // Filter by series
+  if (filterSeries) entries = entries.filter(([,v]) => v.series === filterSeries);
+
+  // Search filter (hash or file)
+  if (search) entries = entries.filter(([hash, v]) =>
+    hash.toLowerCase().includes(search) || (v.file||'').toLowerCase().includes(search)
+  );
+
+  // Sort
+  if (sortBy === 'series') {
+    entries = [...entries].sort((a,b) => {
+      const sc = (a[1].series||'').localeCompare(b[1].series||'');
+      if (sc !== 0) return sc;
+      const vc = (a[1].volume||0) - (b[1].volume||0);
+      if (vc !== 0) return vc;
+      return (a[1].chapter||0) - (b[1].chapter||0);
+    });
+  } else if (sortBy === 'vol') {
+    entries = [...entries].sort((a,b) => {
+      const vc = (a[1].volume||0) - (b[1].volume||0);
+      if (vc !== 0) return vc;
+      return (a[1].chapter||0) - (b[1].chapter||0);
+    });
+  } else if (sortBy === 'hash') {
+    entries = [...entries].sort((a,b) => a[0].localeCompare(b[0]));
+  }
+
+  document.getElementById('hm-count').textContent =
+    entries.length === _hmData.length ? `${_hmData.length} entries` : `${entries.length} / ${_hmData.length} entries`;
+
+  if (!entries.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="color:var(--text3);padding:10px">No matching entries</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = entries.map(([hash, v]) => {
+    let lockLabel, lockClass;
+    if (!v.locked) {
+      lockLabel = 'Free'; lockClass = 'free';
+    } else if (v.unlocksPair) {
+      lockLabel = v.adwallUrl ? '🔒 Pair-A' : '⚠️ Pair-A (no URL!)'; lockClass = 'locked';
+    } else if (v.locked && !v.adwallUrl && v.unlockKey) {
+      lockLabel = '🔗 Pair-B'; lockClass = 'locked';
+    } else {
+      lockLabel = '🔒 Locked'; lockClass = 'locked';
+    }
+    const missingUrl = v.locked && v.unlocksPair && !v.adwallUrl;
+    return `
+    <tr${missingUrl ? ' style="background:rgba(200,80,80,0.07)"' : ''}>
+      <td class="hash-mono">${hash}</td>
+      <td>${v.series}</td>
+      <td>${v.volume}</td>
+      <td>${v.chapter}</td>
+      <td class="hash-mono" style="color:var(--text3);font-size:0.72rem">${v.file}</td>
+      <td><span class="lock-pill ${lockClass}">${lockLabel}</span></td>
+      <td class="hash-mono" style="font-size:0.7rem;color:var(--text3)">${v.prev||'—'}</td>
+      <td class="hash-mono" style="font-size:0.7rem;color:var(--text3)">${v.next||'—'}</td>
+    </tr>`;
+  }).join('');
 }
 
 function exportHashmap() {
