@@ -35,6 +35,13 @@
       "title": "Chapter 2: Nail Machine 1",
       "hash": "HJKQ3IKbJ",
       "locked": false
+    },
+    {
+      "volume": 1,
+      "chapter": 6,
+      "title": "Chapter 2: Nail Machine 2",
+      "hash": "9c4Njl3ac",
+      "locked": true
     }
   ]
 }
