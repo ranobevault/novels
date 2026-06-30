@@ -736,7 +736,7 @@
     "file": "YXYYj4Sxq.json",
     "locked": true,
     "prev": "AVlEOqvla",
-    "next": null,
+    "next": "LlXBCYOoK",
     "adwallUrl": "https://link-center.net/5798120/BLNvaScOTpHq",
     "unlockKey": "uk_NBjZSkHwxy"
   },
@@ -797,5 +797,14 @@
     "next": null,
     "adwallUrl": "https://link-target.net/5798120/oewbgH9OmYvs",
     "unlockKey": "uk_J3eVY96xga"
+  },
+  "LlXBCYOoK": {
+    "series": "the-villainess-who-was-dumped-got-married-into-my-family-a-mob-noble-from-the-frontier-and-turns-out-she-s-an-amazing-capable-wife",
+    "volume": 1,
+    "chapter": 10,
+    "file": "LlXBCYOoK.json",
+    "locked": false,
+    "prev": "YXYYj4Sxq",
+    "next": null
   }
 }
