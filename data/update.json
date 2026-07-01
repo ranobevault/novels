@@ -3,6 +3,14 @@
     "series_id": "valkyrie-bullet",
     "title": "Valkyrie Bullet",
     "cover": "https://i.imgur.com/b6Vd69k.jpeg",
+    "reason": "Vol.2 Ch.4 added",
+    "url": "series.html?id=valkyrie-bullet",
+    "timestamp": "2026-07-01T11:34:45.642Z"
+  },
+  {
+    "series_id": "valkyrie-bullet",
+    "title": "Valkyrie Bullet",
+    "cover": "https://i.imgur.com/b6Vd69k.jpeg",
     "reason": "Vol.2 Ch.3 added",
     "url": "series.html?id=valkyrie-bullet",
     "timestamp": "2026-07-01T11:29:04.046Z"
@@ -150,13 +158,5 @@
     "reason": "Vol.1 Ch.2 added",
     "url": "series.html?id=dragon-gal-s-nail-artist",
     "timestamp": "2026-06-17T11:32:19.170Z"
-  },
-  {
-    "series_id": "dragon-gal-s-nail-artist",
-    "title": "Dragon Gal's Nail Artist",
-    "cover": "https://ranobevault.github.io/novels/covers/cover.jpg",
-    "reason": "Volume 1 Chapter 1 added",
-    "url": "series.html?id=dragon-gal-s-nail-artist",
-    "timestamp": "2026-06-17T11:25:16.845Z"
   }
 ]
