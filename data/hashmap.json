@@ -881,6 +881,17 @@
     "file": "T0D9IZyNq.json",
     "locked": false,
     "prev": "BXSOiIB1B",
-    "next": null
+    "next": "A7DXAiAy4"
+  },
+  "A7DXAiAy4": {
+    "series": "dragon-gal-s-nail-artist",
+    "volume": 1,
+    "chapter": 9,
+    "file": "A7DXAiAy4.json",
+    "locked": true,
+    "prev": "T0D9IZyNq",
+    "next": null,
+    "adwallUrl": "https://link-target.net/5798120/JXvzMKsiW5lU",
+    "unlockKey": "uk_MFxxwHruVD"
   }
 }
