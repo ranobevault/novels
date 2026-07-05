@@ -56,6 +56,13 @@
       "title": "Chapter 3: Pedicure 2",
       "hash": "T0D9IZyNq",
       "locked": false
+    },
+    {
+      "volume": 1,
+      "chapter": 9,
+      "title": "Chapter 3: Pedicure 3",
+      "hash": "A7DXAiAy4",
+      "locked": true
     }
   ]
 }
