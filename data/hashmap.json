@@ -872,6 +872,15 @@
     "file": "BXSOiIB1B.json",
     "locked": false,
     "prev": "9c4Njl3ac",
+    "next": "T0D9IZyNq"
+  },
+  "T0D9IZyNq": {
+    "series": "dragon-gal-s-nail-artist",
+    "volume": 1,
+    "chapter": 8,
+    "file": "T0D9IZyNq.json",
+    "locked": false,
+    "prev": "BXSOiIB1B",
     "next": null
   }
 }
