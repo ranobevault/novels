@@ -613,7 +613,7 @@
     "file": "RCNd53Cou.json",
     "locked": false,
     "prev": "896LbzBo5",
-    "next": "asTAqvAQA"
+    "next": "15U9aMBmU"
   },
   "qqQEfu8dT": {
     "series": "the-villainess-who-was-dumped-got-married-into-my-family-a-mob-noble-from-the-frontier-and-turns-out-she-s-an-amazing-capable-wife",
@@ -920,5 +920,16 @@
     "locked": false,
     "prev": "RCNd53Cou",
     "next": null
+  },
+  "15U9aMBmU": {
+    "series": "life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "volume": 2,
+    "chapter": 1,
+    "file": "15U9aMBmU.json",
+    "locked": true,
+    "prev": "RCNd53Cou",
+    "next": null,
+    "adwallUrl": "https://link-target.net/5798120/k6TrnQLV0e68",
+    "unlockKey": "uk_ZPwyb8ncEC"
   }
 }
