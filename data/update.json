@@ -3,6 +3,14 @@
     "series_id": "valkyrie-bullet",
     "title": "Valkyrie Bullet",
     "cover": "https://i.imgur.com/b6Vd69k.jpeg",
+    "reason": "Vol.2 Ch.8 added",
+    "url": "series.html?id=valkyrie-bullet",
+    "timestamp": "2026-07-11T10:40:13.004Z"
+  },
+  {
+    "series_id": "valkyrie-bullet",
+    "title": "Valkyrie Bullet",
+    "cover": "https://i.imgur.com/b6Vd69k.jpeg",
     "reason": "Vol.2 Ch.7 added",
     "url": "series.html?id=valkyrie-bullet",
     "timestamp": "2026-07-11T10:34:35.417Z"
@@ -150,13 +158,5 @@
     "reason": "Vol.1 Ch.4 added",
     "url": "series.html?id=dragon-gal-s-nail-artist",
     "timestamp": "2026-06-28T09:59:41.918Z"
-  },
-  {
-    "series_id": "valkyrie-bullet",
-    "title": "Valkyrie Bullet",
-    "cover": "https://i.imgur.com/b6Vd69k.jpeg",
-    "reason": "Vol.2 Ch.2 added",
-    "url": "series.html?id=valkyrie-bullet",
-    "timestamp": "2026-06-27T09:54:09.263Z"
   }
 ]
