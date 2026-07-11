@@ -927,21 +927,13 @@ function showAdwall(targetHash) {
   const overlay = document.getElementById('adwall');
   const link = document.getElementById('adwall-link');
 
-  // If this entry has no adwallUrl (pair-B side), find the paired A-side that does
-  let adwallUrl = entry?.adwallUrl;
-  if (!adwallUrl && entry?.unlockKey) {
-    const pairedEntry = Object.values(hashmapData).find(
-      e => e.unlockKey === entry.unlockKey && e.adwallUrl
-    );
-    if (pairedEntry) adwallUrl = pairedEntry.adwallUrl;
-  }
-
-  if (adwallUrl) {
-    link.href = adwallUrl;
+  if (entry && entry.adwallUrl) {
+    link.href = entry.adwallUrl;
     link.style.opacity = '1';
     link.style.pointerEvents = 'all';
   } else {
     link.href = '#';
+    link.querySelector ? (link.querySelector('.adwall-btn-icon') || link).textContent : null;
     link.style.opacity = '0.5';
     link.style.pointerEvents = 'none';
   }
@@ -1231,9 +1223,29 @@ if (unlockParam) {
   }, true);
 
   // ── 5. Copy / Cut events ─────────────────────────────────────
+  // Instead of just blocking, we replace the clipboard with a
+  // protected message — so anyone who pastes gets this instead
+  // of the real chapter text. Works in browser, EPUB editors,
+  // Notepad, Discord, anywhere they paste.
+  const PROTECTED_MESSAGE =
+`--------------------------------------------------
+This chapter is protected.
+Please read the official version on RanobeVault:
+https://ranobevault.github.io
+
+Thank you for supporting the website.
+--------------------------------------------------`;
+
   document.addEventListener('copy', function(e) {
     e.preventDefault();
     e.stopImmediatePropagation();
+    // Write the protection message into the clipboard
+    if (e.clipboardData) {
+      e.clipboardData.setData('text/plain', PROTECTED_MESSAGE);
+      e.clipboardData.setData('text/html',
+        `<p style="font-family:monospace;white-space:pre">${PROTECTED_MESSAGE.replace(/\n/g,'<br>')}</p>`
+      );
+    }
     if (window.getSelection) window.getSelection().removeAllRanges();
     fireAlert('Copying is not allowed on this page.');
     return false;
@@ -1242,6 +1254,10 @@ if (unlockParam) {
   document.addEventListener('cut', function(e) {
     e.preventDefault();
     e.stopImmediatePropagation();
+    if (e.clipboardData) {
+      e.clipboardData.setData('text/plain', PROTECTED_MESSAGE);
+    }
+    if (window.getSelection) window.getSelection().removeAllRanges();
     fireAlert('Cutting is not allowed on this page.');
     return false;
   }, true);
