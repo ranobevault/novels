@@ -890,7 +890,7 @@
     "file": "A7DXAiAy4.json",
     "locked": true,
     "prev": "T0D9IZyNq",
-    "next": null,
+    "next": "QwSHmOmv5",
     "adwallUrl": "https://link-target.net/5798120/JXvzMKsiW5lU",
     "unlockKey": "uk_MFxxwHruVD"
   },
@@ -989,5 +989,14 @@
     "next": null,
     "adwallUrl": "https://link-hub.net/5798120/5GAwpTBZeiEZ",
     "unlockKey": "uk_QnnUAgTv99"
+  },
+  "QwSHmOmv5": {
+    "series": "dragon-gal-s-nail-artist",
+    "volume": 1,
+    "chapter": 10,
+    "file": "QwSHmOmv5.json",
+    "locked": false,
+    "prev": "A7DXAiAy4",
+    "next": null
   }
 }
