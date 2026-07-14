@@ -1006,6 +1006,17 @@
     "file": "8PsH6phZm.json",
     "locked": false,
     "prev": "QwSHmOmv5",
-    "next": null
+    "next": "mHd0jn7Dc"
+  },
+  "mHd0jn7Dc": {
+    "series": "dragon-gal-s-nail-artist",
+    "volume": 1,
+    "chapter": 11,
+    "file": "mHd0jn7Dc.json",
+    "locked": true,
+    "prev": "8PsH6phZm",
+    "next": null,
+    "adwallUrl": "https://link-hub.net/5798120/rurAH1avMQt5",
+    "unlockKey": "uk_6yWmUC65TL"
   }
 }
