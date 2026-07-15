@@ -144,6 +144,51 @@
   .file-drop-label { font-size: 0.82rem; color: var(--text3); }
   .file-name { font-size: 0.8rem; color: var(--green); margin-top: 6px; }
 
+  /* MESSAGES TAB */
+  .msg-toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .msg-filter { display: flex; gap: 6px; }
+  .msg-filter .btn-sm.active { background: var(--accent); color: #1a1410; border-color: var(--accent); font-weight: 700; }
+  .msg-count-pill {
+    font-size: 0.72rem; color: var(--text3); background: var(--bg3);
+    border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; margin-left: auto;
+  }
+  .msg-card {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 12px; transition: border-color 0.2s;
+  }
+  .msg-card.unread { border-left-color: var(--accent); }
+  .msg-card.resolved { opacity: 0.6; }
+  .msg-card-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .msg-user { font-weight: 700; color: var(--text); font-size: 0.9rem; }
+  .msg-time { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
+  .msg-badge {
+    font-size: 0.68rem; padding: 3px 9px; border-radius: 20px; font-weight: 700;
+    letter-spacing: 0.03em; white-space: nowrap; border: 1px solid transparent;
+  }
+  .msg-badge.fix_chapter { background: rgba(224,92,106,0.14); color: var(--red); border-color: rgba(224,92,106,0.3); }
+  .msg-badge.request_translation { background: rgba(106,180,224,0.14); color: var(--blue); border-color: rgba(106,180,224,0.3); }
+  .msg-badge.report_bug { background: rgba(224,92,106,0.14); color: var(--red); border-color: rgba(224,92,106,0.3); }
+  .msg-badge.suggest_series { background: rgba(92,224,160,0.14); color: var(--green); border-color: rgba(92,224,160,0.3); }
+  .msg-badge.feedback { background: rgba(200,169,110,0.14); color: var(--accent); border-color: rgba(200,169,110,0.3); }
+  .msg-badge.other { background: var(--bg3); color: var(--text2); border-color: var(--border); }
+  .msg-status-pill { font-size: 0.68rem; color: var(--text3); margin-left: auto; text-transform: uppercase; letter-spacing: 0.04em; }
+  .msg-context {
+    font-size: 0.75rem; color: var(--text3); background: var(--bg3); border: 1px dashed var(--border);
+    border-radius: 7px; padding: 6px 10px; margin-bottom: 10px; display: inline-block;
+  }
+  .msg-context a { color: var(--blue); text-decoration: none; }
+  .msg-context a:hover { text-decoration: underline; }
+  .msg-details { font-size: 0.86rem; color: var(--text); line-height: 1.55; white-space: pre-wrap; margin-bottom: 12px; }
+  .msg-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .msg-empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 0.88rem; }
+  .msg-empty-icon { font-size: 2rem; margin-bottom: 10px; }
+
+  /* SIDEBAR BADGE */
+  .tab-badge {
+    background: var(--accent); color: #1a1410; font-size: 0.65rem; font-weight: 700;
+    border-radius: 20px; padding: 1px 7px; margin-left: auto;
+  }
+
   /* OUTPUT LOG */
   .log-box {
     background: var(--bg); border: 1px solid var(--border);
@@ -420,6 +465,7 @@
     <div class="tab-item" data-tab="update-series"><span class="tab-icon">✏️</span><span class="tab-label">Update Series</span></div>
     <div class="tab-item" data-tab="hashmap"><span class="tab-icon">🗺️</span><span class="tab-label">Hash Map</span></div>
     <div class="tab-item" data-tab="quick-actions"><span class="tab-icon">⚡</span><span class="tab-label">Quick Actions</span></div>
+    <div class="tab-item" data-tab="messages"><span class="tab-icon">💬</span><span class="tab-label">Messages</span><span class="tab-badge" id="msg-badge" style="display:none">0</span></div>
     <div class="tab-item" style="margin-top:auto;border-top:1px solid var(--border)" data-tab="delete"><span class="tab-icon">🗑️</span><span class="tab-label" style="color:var(--red)">Delete</span></div>
   </div>
 
@@ -709,6 +755,47 @@
             <thead><tr><th>Hash</th><th>Series</th><th>Vol</th><th>Ch</th><th>File</th><th>Status</th><th>Prev</th><th>Next</th></tr></thead>
             <tbody id="hash-tbody"><tr><td colspan="8" style="color:var(--text3);padding:20px">Click Refresh to load</td></tr></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="tab-pane" id="tab-messages">
+      <div class="card">
+        <div class="card-title">⚙️ Messages Worker Config</div>
+        <div class="form-row">
+          <div class="form-group full">
+            <label for="msg-worker-url">Worker URL</label>
+            <input class="form-input" id="msg-worker-url" placeholder="https://ranobevault-contact.you.workers.dev">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group full">
+            <label for="msg-admin-key">Admin Key</label>
+            <input class="form-input" id="msg-admin-key" type="password" placeholder="the ADMIN_KEY secret you set on the Worker">
+          </div>
+        </div>
+        <button class="btn-sm primary" onclick="msgSaveConfig()">Save</button>
+        <span class="config-status" id="msg-config-status" style="margin-left:10px"></span>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💬 Inbox</div>
+        <div class="msg-toolbar">
+          <div class="msg-filter">
+            <button class="btn-sm active" data-mfilter="all" onclick="msgSetFilter('all')">All</button>
+            <button class="btn-sm" data-mfilter="unread" onclick="msgSetFilter('unread')">Unread</button>
+            <button class="btn-sm" data-mfilter="read" onclick="msgSetFilter('read')">Read</button>
+            <button class="btn-sm" data-mfilter="resolved" onclick="msgSetFilter('resolved')">Resolved</button>
+          </div>
+          <span class="msg-count-pill" id="msg-count-pill">—</span>
+          <button class="btn-sm" onclick="loadMessages()">↻ Refresh</button>
+        </div>
+        <div id="msg-list">
+          <div class="msg-empty">
+            <div class="msg-empty-icon">💬</div>
+            Enter your Worker URL and Admin Key above, then Refresh.
+          </div>
         </div>
       </div>
     </div>
@@ -2438,6 +2525,157 @@ async function dsExecute() {
   finally { document.getElementById('ds-go-btn').disabled=false; }
 }
 
+// ========== MESSAGES ==========
+let allMessages = [];
+let msgFilter = 'all';
+const MSG_REASON_LABELS = {
+  fix_chapter: '🛠️ Fix Chapter', request_translation: '🌐 Translation Req',
+  report_bug: '🐞 Bug Report', suggest_series: '📚 Suggest Series',
+  feedback: '💛 Feedback', other: '✨ Other'
+};
+
+function msgEscapeHtml(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function msgSaveConfig() {
+  const cfg = {
+    url: document.getElementById('msg-worker-url').value.trim().replace(/\/+$/, ''),
+    key: document.getElementById('msg-admin-key').value.trim()
+  };
+  localStorage.setItem('ns_msg_config', JSON.stringify(cfg));
+  const status = document.getElementById('msg-config-status');
+  status.textContent = '✓ Saved'; status.className = 'config-status ok';
+}
+
+function msgLoadConfig() {
+  const saved = localStorage.getItem('ns_msg_config');
+  if (!saved) return null;
+  const cfg = JSON.parse(saved);
+  const urlEl = document.getElementById('msg-worker-url');
+  const keyEl = document.getElementById('msg-admin-key');
+  if (urlEl) urlEl.value = cfg.url || '';
+  if (keyEl) keyEl.value = cfg.key || '';
+  return cfg;
+}
+
+function msgGetConfig(quiet) {
+  const cfg = JSON.parse(localStorage.getItem('ns_msg_config') || 'null');
+  if (!cfg || !cfg.url || !cfg.key) {
+    if (!quiet) alert('Please fill in the Worker URL and Admin Key above first, then click Save.');
+    return null;
+  }
+  return cfg;
+}
+
+async function loadMessages(quiet = false) {
+  const cfg = msgGetConfig(quiet); if (!cfg) return;
+  const list = document.getElementById('msg-list');
+  if (!quiet && list) list.innerHTML = '<div class="msg-empty">Loading…</div>';
+  try {
+    const res = await fetch(`${cfg.url}/messages`, { headers: { Authorization: `Bearer ${cfg.key}` } });
+    if (!res.ok) throw new Error(res.status === 401 ? 'Unauthorized — check your Admin Key' : `HTTP ${res.status}`);
+    const data = await res.json();
+    allMessages = Array.isArray(data.messages) ? data.messages : [];
+    renderMessages();
+  } catch (e) {
+    if (!quiet && list) list.innerHTML = `<div class="msg-empty">❌ Failed to load: ${msgEscapeHtml(e.message)}</div>`;
+  }
+}
+
+function msgSetFilter(f) {
+  msgFilter = f;
+  document.querySelectorAll('[data-mfilter]').forEach(b => b.classList.toggle('active', b.dataset.mfilter === f));
+  renderMessages();
+}
+
+function renderMessages() {
+  const list = document.getElementById('msg-list');
+  if (!list) return;
+  const unreadCount = allMessages.filter(m => m.status === 'unread').length;
+  const badge = document.getElementById('msg-badge');
+  if (badge) {
+    if (unreadCount > 0) { badge.style.display = 'inline-block'; badge.textContent = unreadCount; }
+    else { badge.style.display = 'none'; }
+  }
+  const pill = document.getElementById('msg-count-pill');
+  if (pill) pill.textContent = `${allMessages.length} total · ${unreadCount} unread`;
+
+  let filtered = allMessages;
+  if (msgFilter === 'unread') filtered = allMessages.filter(m => m.status === 'unread');
+  else if (msgFilter === 'read') filtered = allMessages.filter(m => m.status === 'read');
+  else if (msgFilter === 'resolved') filtered = allMessages.filter(m => m.status === 'resolved');
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="msg-empty"><div class="msg-empty-icon">💬</div>No messages${msgFilter !== 'all' ? ' in this view.' : ' yet — they\'ll show up here as visitors send them.'}</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(m => {
+    const reasonLabel = MSG_REASON_LABELS[m.reason] || MSG_REASON_LABELS.other;
+    const reasonClass = MSG_REASON_LABELS[m.reason] ? m.reason : 'other';
+    let time = m.timestamp;
+    try { time = new Date(m.timestamp).toLocaleString(); } catch (e) {}
+    const contextHtml = m.page
+      ? `<div class="msg-context">📍 <a href="${msgEscapeHtml(m.page.url)}" target="_blank" rel="noopener">${msgEscapeHtml(m.page.title || m.page.url)}</a></div>`
+      : '';
+    return `
+      <div class="msg-card ${m.status === 'unread' ? 'unread' : ''} ${m.status === 'resolved' ? 'resolved' : ''}">
+        <div class="msg-card-top">
+          <div>
+            <div class="msg-user">${msgEscapeHtml(m.username)}</div>
+            <div class="msg-time">${msgEscapeHtml(time)}</div>
+          </div>
+          <span class="msg-badge ${reasonClass}">${reasonLabel}</span>
+          <span class="msg-status-pill">${msgEscapeHtml(m.status)}</span>
+        </div>
+        ${contextHtml}
+        <div class="msg-details">${msgEscapeHtml(m.details)}</div>
+        <div class="msg-actions">
+          ${m.status !== 'read' ? `<button class="btn-sm" onclick="msgSetStatus('${m.id}','read')">✓ Mark Read</button>` : `<button class="btn-sm" onclick="msgSetStatus('${m.id}','unread')">↺ Mark Unread</button>`}
+          ${m.status !== 'resolved' ? `<button class="btn-sm success" onclick="msgSetStatus('${m.id}','resolved')">✔ Resolve</button>` : ''}
+          <button class="btn-sm danger" onclick="msgDelete('${m.id}')">🗑 Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function msgSetStatus(id, status) {
+  const cfg = msgGetConfig(); if (!cfg) return;
+  const msg = allMessages.find(m => m.id === id); if (!msg) return;
+  const prev = msg.status;
+  msg.status = status;
+  renderMessages();
+  try {
+    const res = await fetch(`${cfg.url}/messages/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${cfg.key}` },
+      body: JSON.stringify({ status })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  } catch (e) {
+    msg.status = prev; renderMessages(); alert('Failed to update: ' + e.message);
+  }
+}
+
+async function msgDelete(id) {
+  const cfg = msgGetConfig(); if (!cfg) return;
+  if (!confirm('Delete this message permanently? This cannot be undone.')) return;
+  const idx = allMessages.findIndex(m => m.id === id); if (idx === -1) return;
+  const backup = allMessages[idx];
+  allMessages.splice(idx, 1);
+  renderMessages();
+  try {
+    const res = await fetch(`${cfg.url}/messages/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${cfg.key}` }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  } catch (e) {
+    allMessages.splice(idx, 0, backup); renderMessages(); alert('Failed to delete: ' + e.message);
+  }
+}
+
 // ========== TAB SWITCHING ==========
 document.querySelectorAll('.tab-item').forEach(item => {
   item.addEventListener('click', () => {
@@ -2449,11 +2687,14 @@ document.querySelectorAll('.tab-item').forEach(item => {
     if (item.dataset.tab === 'hashmap') loadHashmap();
     if (item.dataset.tab === 'batch-upload') batchInitTab();
     if (item.dataset.tab === 'delete') { delLoadSeries(); }
+    if (item.dataset.tab === 'messages') { loadMessages(); }
   });
 });
 
 // ========== INIT ==========
 loadConfig();
+msgLoadConfig();
+loadMessages(true); // quietly populate the unread badge if config is already saved
 </script>
 </body>
 </html>

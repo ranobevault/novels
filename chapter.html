@@ -479,6 +479,14 @@ let currentEntry = null;
 let fontSize = parseInt(localStorage.getItem('reader_fontsize') || '17');
 let isLight = localStorage.getItem('reader_light') === '1';
 
+var CHAPTER_ENDPOINT = 'https://YOUR-WORKER-SUBDOMAIN.workers.dev/chapter'; // <-- set after deploying the chapter-gateway Cloudflare Worker
+
+async function fetchChapterFile(filename) {
+  const res = await fetch(`${CHAPTER_ENDPOINT}?file=${encodeURIComponent(filename)}`);
+  if (!res.ok) throw new Error('Chapter file not found');
+  return res.json();
+}
+
 if (!hash) { location.href = 'index.html'; }
 
 // Apply saved settings immediately
@@ -512,15 +520,13 @@ async function init() {
     }
 
     // Load chapter JSON
-    const chRes = await fetch(`data/chapters/${currentEntry.file}`);
-    if (!chRes.ok) throw new Error('Chapter file not found');
-    chapterData = await chRes.json();
+    chapterData = await fetchChapterFile(currentEntry.file);
 
     // Preload next chapter
     if (currentEntry.next) {
       const nextEntry = hashmapData[currentEntry.next];
       if (nextEntry && !nextEntry.locked) {
-        fetch(`data/chapters/${nextEntry.file}`).catch(() => {});
+        fetchChapterFile(nextEntry.file).catch(() => {});
       }
     }
 
@@ -542,6 +548,35 @@ function randJunk(len) {
     s += JUNK_POOL[Math.floor(Math.random() * JUNK_POOL.length)];
   return s;
 }
+
+// LAYER C — Watermark landmines.
+// The _jnk junk spans (below) are gibberish, so a scraper's cleanup pass
+// will likely target and strip anything that looks like garbage. These
+// watermark spans are plain, readable site-credit text instead — the kind
+// of string a cleanup script has no reason to flag — and each one gets a
+// randomly chosen inline style (never the _jnk class, never the same
+// style twice in a row), so a single ".remove('._jnk')" or similar rule
+// won't catch them. If they survive a strip pass, they surface in the
+// ripped file/EPUB wherever CSS gets dropped, crediting the site inline.
+const WATERMARK_RATE = 0.12; // ~1 in 8 paragraphs
+const WATERMARKS = [
+  'Read this officially at ranobevault.github.io',
+  'Official source: RanobeVault — ranobevault.github.io',
+  'Support the translator, read free at ranobevault.github.io',
+  'This chapter is hosted at ranobevault.github.io',
+];
+function watermarkSpan() {
+  const phrase = WATERMARKS[Math.floor(Math.random() * WATERMARKS.length)];
+  const styles = [
+    'display:none',
+    'font-size:0;line-height:0;color:transparent',
+    'position:absolute;width:0;height:0;overflow:hidden;clip:rect(0,0,0,0)',
+    'font-size:0;color:transparent;position:absolute;left:-9999px',
+  ];
+  const style = styles[Math.floor(Math.random() * styles.length)];
+  return ` <span aria-hidden="true" style="${style}">${phrase}</span> `;
+}
+
 // ── Unicode poison pool ──────────────────────────────────────────────────────
 // LAYER A — Invisible zero-width / directional / formatting chars
 // These break tokenizers, search, copy-paste reconstruction.
@@ -627,7 +662,7 @@ function poisonWord(word) {
 function obfuscatePara(text) {
   const esc = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const words = esc.split(' ');
-  return words.map((word, i) => {
+  const processedWords = words.map((word, i) => {
     if (!word) return '';
     // Visible word is completely untouched — renders perfectly on screen.
     // All poison is stuffed inside display:none / zero-size spans.
@@ -640,7 +675,15 @@ function obfuscatePara(text) {
     const poison = poisonChars();
     const glyphed = applyHomoglyphs(randJunk(3 + Math.floor(Math.random() * 4)));
     return `${word}<span aria-hidden="true" style="${style}" class="_jnk">${poison}${ascii}${glyphed}</span>`;
-  }).join(' ');
+  });
+
+  // Splice in a watermark landmine at a random word boundary in ~1 of 8 paragraphs.
+  if (processedWords.length > 3 && Math.random() < WATERMARK_RATE) {
+    const idx = 1 + Math.floor(Math.random() * (processedWords.length - 1));
+    processedWords.splice(idx, 0, watermarkSpan());
+  }
+
+  return processedWords.join(' ');
 }
 function processContent(paragraphs) {
   let html = '';
@@ -994,9 +1037,7 @@ function showBookmarkAlert() {
 
 async function loadAndRenderChapter() {
   try {
-    const chRes = await fetch(`data/chapters/${currentEntry.file}`);
-    if (!chRes.ok) throw new Error('Chapter file not found');
-    chapterData = await chRes.json();
+    chapterData = await fetchChapterFile(currentEntry.file);
     renderChapter();
     updateBackLink();
     saveProgress();
@@ -1340,5 +1381,351 @@ Thank you for supporting the website.
 
 })();
 </script>
+<!-- ============ CONTACT WIDGET ============ -->
+<style>
+  :root{ --cw-endpoint: ""; }
+
+  .cw-fab {
+    position: fixed; bottom: 22px; right: 22px; z-index: 9998;
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #1a1410; border: none; border-radius: 999px;
+    padding: 12px 18px 12px 14px; cursor: pointer;
+    font-family: 'Lato', sans-serif; font-size: 0.85rem; font-weight: 700;
+    box-shadow: 0 6px 20px rgba(0,0,0,.35), 0 0 0 rgba(200,169,110,.5);
+    transition: transform .25s ease, box-shadow .25s ease;
+    animation: cw-pop .5s ease .3s both, cw-pulse 2.6s ease-in-out 1.2s 2;
+  }
+  .cw-fab:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 26px rgba(0,0,0,.4); }
+  .cw-fab:active { transform: translateY(-1px) scale(.98); }
+  .cw-fab-icon { font-size: 1.05rem; line-height: 1; }
+  .cw-fab-text { white-space: nowrap; }
+  .cw-fab.cw-hidden { display: none; }
+
+  @keyframes cw-pop { from { transform: scale(0) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+  @keyframes cw-pulse {
+    0%, 100% { box-shadow: 0 6px 20px rgba(0,0,0,.35), 0 0 0 0 rgba(200,169,110,.45); }
+    50% { box-shadow: 0 6px 20px rgba(0,0,0,.35), 0 0 0 8px rgba(200,169,110,0); }
+  }
+
+  .cw-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(8,8,12,.55); backdrop-filter: blur(2px);
+    display: flex; align-items: flex-end; justify-content: flex-end;
+    padding: 22px; opacity: 0; pointer-events: none;
+    transition: opacity .22s ease;
+  }
+  .cw-overlay.cw-open { opacity: 1; pointer-events: all; }
+
+  .cw-panel {
+    width: 100%; max-width: 360px;
+    background: var(--surface, #1e1e2e); border: 1px solid var(--border, #2e2e45);
+    border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: translateY(24px) scale(.97); opacity: 0;
+    transition: transform .28s cubic-bezier(.2,.9,.3,1.2), opacity .22s ease;
+    max-height: min(560px, 80vh);
+    font-family: 'Lato', sans-serif;
+  }
+  .cw-overlay.cw-open .cw-panel { transform: translateY(0) scale(1); opacity: 1; }
+
+  .cw-head {
+    padding: 16px 18px; display: flex; align-items: center; gap: 10px;
+    background: var(--bg3, #1a1a28); border-bottom: 1px solid var(--border, #2e2e45);
+  }
+  .cw-head-icon {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  }
+  .cw-head-txt { flex: 1; min-width: 0; }
+  .cw-head-title {
+    font-family: 'Cinzel', serif; font-size: .95rem; color: var(--accent);
+    font-weight: 700; letter-spacing: .02em;
+  }
+  .cw-head-sub { font-size: .72rem; color: var(--text3, #6b6884); margin-top: 2px; }
+  .cw-close {
+    background: none; border: none; color: var(--text3, #6b6884); cursor: pointer;
+    font-size: 1.1rem; line-height: 1; padding: 6px; border-radius: 6px; transition: color .15s, background .15s;
+  }
+  .cw-close:hover { color: var(--text, #e8e6f0); background: rgba(255,255,255,.06); }
+
+  .cw-body { padding: 16px 18px 18px; overflow-y: auto; }
+
+  .cw-field { margin-bottom: 14px; }
+  .cw-label {
+    display: block; font-size: .72rem; color: var(--text2, #a09dbb);
+    letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; font-weight: 700;
+  }
+  .cw-input, .cw-select, .cw-textarea {
+    width: 100%; background: var(--bg3, #1a1a28); border: 1px solid var(--border, #2e2e45);
+    color: var(--text, #e8e6f0); border-radius: 9px; padding: 10px 12px;
+    font-family: 'Lato', sans-serif; font-size: .86rem; outline: none;
+    transition: border-color .15s;
+  }
+  .cw-input:focus, .cw-select:focus, .cw-textarea:focus { border-color: var(--accent); }
+  .cw-select { appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%239a97b8'/></svg>");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px;
+  }
+  .cw-select option { background: var(--bg3, #1a1a28); }
+  .cw-textarea { resize: vertical; min-height: 92px; line-height: 1.5; }
+
+  .cw-context {
+    font-size: .72rem; color: var(--text3, #6b6884); margin-top: -6px; margin-bottom: 14px;
+    padding: 7px 10px; background: var(--bg3, #1a1a28); border-radius: 7px;
+    border: 1px dashed var(--border, #2e2e45); display: none; gap: 6px; align-items: center;
+  }
+  .cw-context.cw-show { display: flex; }
+  .cw-context b { color: var(--accent); font-weight: 700; }
+
+  .cw-count { text-align: right; font-size: .68rem; color: var(--text3, #6b6884); margin-top: 4px; }
+  .cw-count.cw-warn { color: var(--red, #e05c6a); }
+
+  .cw-hp { position: absolute; left: -9999px; opacity: 0; pointer-events: none; }
+
+  .cw-submit {
+    width: 100%; padding: 11px; border: none; border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #1a1410; font-weight: 700; font-size: .88rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: filter .15s, transform .1s;
+  }
+  .cw-submit:hover { filter: brightness(1.08); }
+  .cw-submit:active { transform: scale(.98); }
+  .cw-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+  .cw-spin {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid rgba(26,20,16,.35); border-top-color: #1a1410;
+    animation: cw-spin .7s linear infinite; display: none;
+  }
+  .cw-submit.cw-loading .cw-spin { display: inline-block; }
+  .cw-submit.cw-loading .cw-submit-txt { opacity: .7; }
+  @keyframes cw-spin { to { transform: rotate(360deg); } }
+
+  .cw-error {
+    display: none; font-size: .76rem; color: var(--red, #e05c6a);
+    background: rgba(224,92,106,.1); border: 1px solid rgba(224,92,106,.3);
+    border-radius: 8px; padding: 8px 10px; margin-top: 10px;
+  }
+  .cw-error.cw-show { display: block; }
+
+  .cw-success {
+    display: none; flex-direction: column; align-items: center; text-align: center;
+    padding: 30px 18px 34px; gap: 10px;
+  }
+  .cw-success.cw-show { display: flex; }
+  .cw-success-check {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(92,224,160,.12); border: 1px solid rgba(92,224,160,.4);
+    display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    color: var(--green, #5ce0a0); animation: cw-pop .35s ease;
+  }
+  .cw-success-title { font-family: 'Cinzel', serif; color: var(--text, #e8e6f0); font-size: .95rem; font-weight: 700; }
+  .cw-success-sub { font-size: .78rem; color: var(--text3, #6b6884); max-width: 290px; line-height: 1.45; }
+
+  .cw-form.cw-hide { display: none; }
+
+  @media (max-width: 480px) {
+    .cw-overlay { padding: 0; align-items: flex-end; }
+    .cw-panel { max-width: 100%; border-radius: 16px 16px 0 0; max-height: 85vh; }
+    .cw-fab-text { display: none; }
+    .cw-fab { padding: 13px; }
+  }
+</style>
+
+<button class="cw-fab" id="cwFab" aria-label="Contact / Support">
+  <span class="cw-fab-icon">💬</span>
+  <span class="cw-fab-text">Support Me</span>
+</button>
+
+<div class="cw-overlay" id="cwOverlay">
+  <div class="cw-panel" role="dialog" aria-modal="true" aria-labelledby="cwTitle">
+    <div class="cw-head">
+      <div class="cw-head-icon">✉️</div>
+      <div class="cw-head-txt">
+        <div class="cw-head-title" id="cwTitle">Get in Touch</div>
+        <div class="cw-head-sub">Requests, fixes, feedback — all read personally</div>
+      </div>
+      <button class="cw-close" id="cwClose" aria-label="Close">✕</button>
+    </div>
+    <div class="cw-body">
+      <form class="cw-form" id="cwForm">
+        <div class="cw-field">
+          <label class="cw-label" for="cwUsername">Your Name / Username</label>
+          <input class="cw-input" id="cwUsername" maxlength="50" placeholder="e.g. NovelFan92" autocomplete="off" required>
+        </div>
+        <div class="cw-field">
+          <label class="cw-label" for="cwReason">Reason</label>
+          <select class="cw-select" id="cwReason">
+            <option value="fix_chapter">🛠️ Fix a Chapter</option>
+            <option value="request_translation">🌐 Request a Translation</option>
+            <option value="report_bug">🐞 Report a Bug</option>
+            <option value="suggest_series">📚 Suggest a Series</option>
+            <option value="feedback">💛 General Feedback</option>
+            <option value="other">✨ Other</option>
+          </select>
+        </div>
+        <div class="cw-context" id="cwContext">
+          📍 <span>Regarding: <b id="cwContextText"></b></span>
+        </div>
+        <div class="cw-field">
+          <label class="cw-label" for="cwDetails">Details</label>
+          <textarea class="cw-textarea" id="cwDetails" maxlength="1000" placeholder="Tell me what's up — the more specific, the faster I can help." required></textarea>
+          <div class="cw-count" id="cwCount">0 / 1000</div>
+        </div>
+        <input class="cw-hp" id="cwHp" type="text" tabindex="-1" autocomplete="off">
+        <button type="submit" class="cw-submit" id="cwSubmit">
+          <span class="cw-spin"></span>
+          <span class="cw-submit-txt">Send Message</span>
+        </button>
+        <div class="cw-error" id="cwError"></div>
+      </form>
+      <div class="cw-success" id="cwSuccess">
+        <div class="cw-success-check">✓</div>
+        <div class="cw-success-title">Message sent!</div>
+        <div class="cw-success-sub" id="cwSuccessSub">Thanks for reaching out — I read every message and usually reply within a few days.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var CW_ENDPOINT = 'https://YOUR-WORKER-SUBDOMAIN.workers.dev/message'; // <-- set after deploying the Cloudflare Worker
+
+  var fab = document.getElementById('cwFab');
+  var overlay = document.getElementById('cwOverlay');
+  var closeBtn = document.getElementById('cwClose');
+  var form = document.getElementById('cwForm');
+  var success = document.getElementById('cwSuccess');
+  var submitBtn = document.getElementById('cwSubmit');
+  var errorBox = document.getElementById('cwError');
+  var reasonSel = document.getElementById('cwReason');
+  var contextBox = document.getElementById('cwContext');
+  var contextText = document.getElementById('cwContextText');
+  var details = document.getElementById('cwDetails');
+  var count = document.getElementById('cwCount');
+  var usernameInput = document.getElementById('cwUsername');
+  var successSub = document.getElementById('cwSuccessSub');
+
+  var REASON_SUCCESS = {
+    fix_chapter: "Thanks for flagging it \u2014 I'll take a look and aim to have it fixed within 24 hours.",
+    report_bug: "Thanks for the report \u2014 I'll take a look and aim to have it fixed within 24 hours.",
+    request_translation: "Noted! It's now on the list of series being considered for translation \u2014 no fixed timeline, but I'll keep it in mind.",
+    suggest_series: "Noted! It's now on the list of series being considered for translation \u2014 no fixed timeline, but I'll keep it in mind.",
+    feedback: "Thanks for the feedback \u2014 I read every message.",
+    other: "Thanks for reaching out \u2014 I read every message."
+  };
+
+  // Remember username across visits
+  try {
+    var savedName = localStorage.getItem('cw_username');
+    if (savedName) usernameInput.value = savedName;
+  } catch(e){}
+
+  function pageContext(){
+    var title = document.title.replace(/\s*[-—|]\s*RanobeVault.*$/i, '').trim();
+    return { title: title || document.title, url: window.location.href };
+  }
+
+  function updateContext(){
+    var reason = reasonSel.value;
+    if (reason === 'fix_chapter' || reason === 'request_translation') {
+      var ctx = pageContext();
+      contextText.textContent = ctx.title;
+      contextBox.classList.add('cw-show');
+    } else {
+      contextBox.classList.remove('cw-show');
+    }
+  }
+  reasonSel.addEventListener('change', updateContext);
+  updateContext();
+
+  details.addEventListener('input', function(){
+    var len = details.value.length;
+    count.textContent = len + ' / 1000';
+    count.classList.toggle('cw-warn', len > 900);
+  });
+
+  function openPanel(){
+    overlay.classList.add('cw-open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ usernameInput.focus(); }, 150);
+  }
+  function closePanel(){
+    overlay.classList.remove('cw-open');
+    document.body.style.overflow = '';
+  }
+  fab.addEventListener('click', openPanel);
+  closeBtn.addEventListener('click', closePanel);
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) closePanel(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && overlay.classList.contains('cw-open')) closePanel(); });
+
+  function resetToForm(){
+    form.classList.remove('cw-hide');
+    success.classList.remove('cw-show');
+    errorBox.classList.remove('cw-show');
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    errorBox.classList.remove('cw-show');
+
+    var honeypot = document.getElementById('cwHp').value;
+    if (honeypot) return; // silently drop bots
+
+    var username = usernameInput.value.trim();
+    var reason = reasonSel.value;
+    var detailsVal = details.value.trim();
+
+    if (!username || !detailsVal) {
+      errorBox.textContent = 'Please fill in your name and the details.';
+      errorBox.classList.add('cw-show');
+      return;
+    }
+
+    try { localStorage.setItem('cw_username', username); } catch(e){}
+
+    var payload = {
+      username: username,
+      reason: reason,
+      details: detailsVal,
+      page: (reason === 'fix_chapter' || reason === 'request_translation') ? pageContext() : null,
+      website: honeypot
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.classList.add('cw-loading');
+
+    fetch(CW_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function(res){
+      if (!res.ok) throw new Error('bad status');
+      return res.json();
+    }).then(function(){
+      successSub.textContent = REASON_SUCCESS[reason] || REASON_SUCCESS.other;
+      form.classList.add('cw-hide');
+      success.classList.add('cw-show');
+      form.reset();
+      usernameInput.value = username;
+      updateContext();
+      count.textContent = '0 / 1000';
+      setTimeout(function(){ closePanel(); setTimeout(resetToForm, 300); }, 4200);
+    }).catch(function(){
+      errorBox.textContent = "Couldn't send — check your connection and try again.";
+      errorBox.classList.add('cw-show');
+    }).finally(function(){
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('cw-loading');
+    });
+  });
+})();
+</script>
+<!-- ============ END CONTACT WIDGET ============ -->
+
 </body>
 </html>
