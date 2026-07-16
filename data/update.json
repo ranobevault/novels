@@ -1,5 +1,13 @@
 [
   {
+    "series_id": "life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "title": "Life as an Adventurer with the Banished Marquis’ Daughter",
+    "cover": "https://ranobevault.github.io/novels/covers/Life-as-an-Adventurer-with-the-Banished-Marquis-Daughter-LN.jpg",
+    "reason": "Vol.2 Ch.2 added",
+    "url": "series.html?id=life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "timestamp": "2026-07-16T12:53:37.629Z"
+  },
+  {
     "series_id": "dragon-gal-s-nail-artist",
     "title": "Dragon Gal's Nail Artist",
     "cover": "https://ranobevault.github.io/novels/covers/cover.jpg",
@@ -150,13 +158,5 @@
     "reason": "Vol.2 Ch.3 added",
     "url": "series.html?id=valkyrie-bullet",
     "timestamp": "2026-07-01T11:29:04.046Z"
-  },
-  {
-    "series_id": "the-villainess-who-was-dumped-got-married-into-my-family-a-mob-noble-from-the-frontier-and-turns-out-she-s-an-amazing-capable-wife",
-    "title": "The Villainess Who Was Dumped Got Married into My Family, a Mob Noble from the Frontier, and Turns Out, She’s an Amazing Capable Wife?",
-    "cover": "https://ranobevault.github.io/novels/covers/capable-wife.jpg",
-    "reason": "Vol.1 Ch.13 added",
-    "url": "series.html?id=the-villainess-who-was-dumped-got-married-into-my-family-a-mob-noble-from-the-frontier-and-turns-out-she-s-an-amazing-capable-wife",
-    "timestamp": "2026-06-30T13:26:28.557Z"
   }
 ]
