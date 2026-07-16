@@ -479,11 +479,18 @@ let currentEntry = null;
 let fontSize = parseInt(localStorage.getItem('reader_fontsize') || '17');
 let isLight = localStorage.getItem('reader_light') === '1';
 
-var CHAPTER_ENDPOINT = 'https://ranobevault-chapters.reyesjustinjay5.workers.dev/chapter'; // <-- set after deploying the chapter-gateway Cloudflare Worker
+var CHAPTER_ENDPOINT = 'https://YOUR-WORKER-SUBDOMAIN.workers.dev/chapter'; // <-- set after deploying the chapter-gateway Cloudflare Worker
+var HASHMAP_ENDPOINT = CHAPTER_ENDPOINT.replace(/\/chapter$/, '/hashmap'); // auto-derived, no separate URL to set
 
 async function fetchChapterFile(filename) {
   const res = await fetch(`${CHAPTER_ENDPOINT}?file=${encodeURIComponent(filename)}`);
   if (!res.ok) throw new Error('Chapter file not found');
+  return res.json();
+}
+
+async function fetchHashmap() {
+  const res = await fetch(HASHMAP_ENDPOINT);
+  if (!res.ok) throw new Error('Hashmap not found');
   return res.json();
 }
 
@@ -501,8 +508,7 @@ function isUnlocked(entry) {
 
 async function init() {
   try {
-    const hmRes = await fetch('data/hashmap.json');
-    hashmapData = await hmRes.json();
+    hashmapData = await fetchHashmap();
     currentEntry = hashmapData[hash];
 
     if (!currentEntry) {
@@ -1537,7 +1543,7 @@ Thank you for supporting the website.
 
 <button class="cw-fab" id="cwFab" aria-label="Contact / Support">
   <span class="cw-fab-icon">💬</span>
-  <span class="cw-fab-text">Message Me</span>
+  <span class="cw-fab-text">Support Me</span>
 </button>
 
 <div class="cw-overlay" id="cwOverlay">
@@ -1593,7 +1599,7 @@ Thank you for supporting the website.
 
 <script>
 (function(){
-var CW_ENDPOINT = 'https://ranobevault-contact.reyesjustinjay5.workers.dev/message'; // <-- set after deploying the Cloudflare Worker
+  var CW_ENDPOINT = 'https://YOUR-WORKER-SUBDOMAIN.workers.dev/message'; // <-- set after deploying the Cloudflare Worker
 
   var fab = document.getElementById('cwFab');
   var overlay = document.getElementById('cwOverlay');
