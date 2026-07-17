@@ -1073,6 +1073,15 @@
     "file": "w8kbl.json",
     "locked": false,
     "prev": null,
+    "next": "943LqY3tb"
+  },
+  "943LqY3tb": {
+    "series": "chained-soldier-demon-defense-force-journal",
+    "volume": 1,
+    "chapter": 2,
+    "file": "943LqY3tb.json",
+    "locked": false,
+    "prev": "sgMSH1GvA",
     "next": null
   }
 }
