@@ -1065,5 +1065,14 @@
     "locked": false,
     "prev": "aVs4JcHMg",
     "next": null
+  },
+  "sgMSH1GvA": {
+    "series": "chained-soldier-demon-defense-force-journal",
+    "volume": 1,
+    "chapter": 1,
+    "file": "w8kbl.json",
+    "locked": false,
+    "prev": null,
+    "next": null
   }
 }
