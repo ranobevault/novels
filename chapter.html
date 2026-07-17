@@ -479,7 +479,7 @@ let currentEntry = null;
 let fontSize = parseInt(localStorage.getItem('reader_fontsize') || '17');
 let isLight = localStorage.getItem('reader_light') === '1';
 
-var CHAPTER_ENDPOINT = 'https://ranobevault-chapters.reyesjustinjay5.workers.dev/chapter'; // <-- set after deploying the chapter-gateway Cloudflare Worker
+var CHAPTER_ENDPOINT = 'https://ranobevault-chapters.non-admin.workers.dev/chapter'; // <-- set after deploying the chapter-gateway Cloudflare Worker
 var HASHMAP_ENDPOINT = CHAPTER_ENDPOINT.replace(/\/chapter$/, '/hashmap'); // auto-derived, no separate URL to set
 
 async function fetchChapterFile(filename) {
@@ -1599,7 +1599,7 @@ Thank you for supporting the website.
 
 <script>
 (function(){
-  var CW_ENDPOINT = 'https://ranobevault-contact.reyesjustinjay5.workers.dev/message'; // <-- set after deploying the Cloudflare Worker
+  var CW_ENDPOINT = 'https://ranobevault-contact.non-admin.workers.dev/message'; // <-- set after deploying the Cloudflare Worker
 
   var fab = document.getElementById('cwFab');
   var overlay = document.getElementById('cwOverlay');
