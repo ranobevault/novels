@@ -575,7 +575,7 @@
     "file": "krZm9rJk4.json",
     "locked": false,
     "prev": "Jd5IgBULI",
-    "next": "DefhRe4Xu"
+    "next": "p9OfRFwKo"
   },
   "bsxhpijRA": {
     "series": "life-as-an-adventurer-with-the-banished-marquis-daughter",
@@ -1105,5 +1105,14 @@
     "next": null,
     "adwallUrl": "https://link-center.net/5798120/JoafN8DbNAhw",
     "unlockKey": "uk_rAQN3K9k6g"
+  },
+  "p9OfRFwKo": {
+    "series": "valkyrie-bullet",
+    "volume": 2,
+    "chapter": 9,
+    "file": "p9OfRFwKo.json",
+    "locked": false,
+    "prev": "krZm9rJk4",
+    "next": null
   }
 }
