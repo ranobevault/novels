@@ -575,7 +575,7 @@
     "file": "krZm9rJk4.json",
     "locked": false,
     "prev": "Jd5IgBULI",
-    "next": "p9OfRFwKo"
+    "next": "PrhRng2UI"
   },
   "bsxhpijRA": {
     "series": "life-as-an-adventurer-with-the-banished-marquis-daughter",
@@ -1111,6 +1111,15 @@
     "volume": 2,
     "chapter": 9,
     "file": "p9OfRFwKo.json",
+    "locked": false,
+    "prev": "krZm9rJk4",
+    "next": null
+  },
+  "PrhRng2UI": {
+    "series": "valkyrie-bullet",
+    "volume": 2,
+    "chapter": 10,
+    "file": "PrhRng2UI.json",
     "locked": false,
     "prev": "krZm9rJk4",
     "next": null
