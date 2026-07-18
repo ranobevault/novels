@@ -1160,9 +1160,17 @@ async function uploadCoverImage() {
       reader.readAsDataURL(coverFileObj);
     });
 
-    // Sanitise filename and build path
-    const safeName = coverFileObj.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    // Auto-generate a hash-style filename (same pattern as chapter files) —
+    // EPUB exports almost always name the cover "cover.jpg", which would
+    // otherwise silently overwrite every previous series' cover on upload.
+    const extMatch = coverFileObj.name.match(/\.[a-zA-Z0-9]+$/);
+    const ext = extMatch ? extMatch[0].toLowerCase() : '.jpg';
+    const safeName = genHash(9) + ext;
     const path = `covers/${safeName}`;
+
+    // Each generated name is new, so no existing file to overwrite —
+    // but keep the SHA lookup as a safety net against the astronomically
+    // unlikely case of a hash collision.
 
     // Check if file already exists (need SHA for update)
     let sha;
