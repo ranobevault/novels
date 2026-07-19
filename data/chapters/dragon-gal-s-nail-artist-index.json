@@ -98,6 +98,13 @@
       "title": "Chapter 5: Skill Certification 1",
       "hash": "n7iZulvXo",
       "locked": false
+    },
+    {
+      "volume": 1,
+      "chapter": 13,
+      "title": "Chapter 5: Skill Certification 2",
+      "hash": "CbuRvb0jM",
+      "locked": true
     }
   ]
 }
