@@ -539,6 +539,36 @@ loadUpdates();
   .cw-success-title { font-family: 'Cinzel', serif; color: var(--text, #e8e6f0); font-size: .95rem; font-weight: 700; }
   .cw-success-sub { font-size: .78rem; color: var(--text3, #6b6884); max-width: 290px; line-height: 1.45; }
 
+  .cw-ticket-box {
+    margin-top: 10px; background: var(--bg3, #1a1a28); border: 1px dashed var(--border, #2e2e45);
+    border-radius: 8px; padding: 10px 12px; width: 100%; text-align: left;
+  }
+  .cw-ticket-label { font-size: .68rem; color: var(--text3, #6b6884); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+  .cw-ticket-row { display: flex; align-items: center; gap: 8px; }
+  .cw-ticket-id { font-family: monospace; font-size: .82rem; color: var(--accent); flex: 1; overflow-wrap: anywhere; }
+  .cw-ticket-copy {
+    background: var(--surface, #1e1e2e); border: 1px solid var(--border, #2e2e45); color: var(--text2, #a09dbb);
+    border-radius: 6px; padding: 4px 10px; font-size: .72rem; cursor: pointer; transition: all .15s; flex-shrink: 0;
+  }
+  .cw-ticket-copy:hover { border-color: var(--accent); color: var(--accent); }
+  .cw-ticket-hint { font-size: .7rem; color: var(--text3, #6b6884); margin-top: 6px; line-height: 1.4; }
+
+  .cw-status-toggle { text-align: center; font-size: .74rem; color: var(--text3, #6b6884); margin-top: 12px; cursor: pointer; }
+  .cw-status-toggle:hover { color: var(--accent); }
+
+  .cw-status-view { display: none; }
+  .cw-status-view.cw-show { display: block; }
+  .cw-status-back { font-size: .74rem; color: var(--text3, #6b6884); cursor: pointer; margin-top: 14px; text-align: center; }
+  .cw-status-back:hover { color: var(--accent); }
+  .cw-status-result { margin-top: 14px; }
+  .cw-status-pill-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .cw-status-badge { font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: capitalize; }
+  .cw-status-badge.unread { background: rgba(200,169,110,.14); color: var(--accent); }
+  .cw-status-badge.read { background: rgba(106,180,224,.14); color: #6ab4e0; }
+  .cw-status-badge.resolved { background: rgba(92,224,160,.14); color: var(--green, #5ce0a0); }
+  .cw-status-meta { font-size: .78rem; color: var(--text2, #a09dbb); line-height: 1.5; }
+  .cw-status-error { font-size: .78rem; color: var(--red, #e05c6a); margin-top: 8px; }
+
   .cw-form.cw-hide { display: none; }
 
   @media (max-width: 480px) {
@@ -551,7 +581,7 @@ loadUpdates();
 
 <button class="cw-fab" id="cwFab" aria-label="Contact / Support">
   <span class="cw-fab-icon">💬</span>
-  <span class="cw-fab-text">Message Me</span>
+  <span class="cw-fab-text">Support Me</span>
 </button>
 
 <div class="cw-overlay" id="cwOverlay">
@@ -595,11 +625,32 @@ loadUpdates();
           <span class="cw-submit-txt">Send Message</span>
         </button>
         <div class="cw-error" id="cwError"></div>
+        <div class="cw-status-toggle" id="cwStatusToggle">Already sent a message? Check its status &rarr;</div>
       </form>
       <div class="cw-success" id="cwSuccess">
         <div class="cw-success-check">✓</div>
         <div class="cw-success-title">Message sent!</div>
         <div class="cw-success-sub" id="cwSuccessSub">Thanks for reaching out — I read every message and usually reply within a few days.</div>
+        <div class="cw-ticket-box">
+          <div class="cw-ticket-label">Your Ticket ID</div>
+          <div class="cw-ticket-row">
+            <span class="cw-ticket-id" id="cwTicketId"></span>
+            <button type="button" class="cw-ticket-copy" id="cwTicketCopy">Copy</button>
+          </div>
+          <div class="cw-ticket-hint">Save this — you can check your status anytime with it.</div>
+        </div>
+      </div>
+      <div class="cw-status-view" id="cwStatusView">
+        <div class="cw-field">
+          <label class="cw-label" for="cwTicketInput">Ticket ID</label>
+          <input class="cw-input" id="cwTicketInput" placeholder="e.g. msg_x7k2p9a1" autocomplete="off">
+        </div>
+        <button type="button" class="cw-submit" id="cwCheckBtn">
+          <span class="cw-spin" id="cwCheckSpin"></span>
+          <span>Check Status</span>
+        </button>
+        <div class="cw-status-result" id="cwStatusResult"></div>
+        <div class="cw-status-back" id="cwStatusBack">&larr; Back to message form</div>
       </div>
     </div>
   </div>
@@ -607,7 +658,7 @@ loadUpdates();
 
 <script>
 (function(){
-var CW_ENDPOINT = 'https://ranobevault-contact.non-admin.workers.dev/message'; // <-- set after deploying the Cloudflare Worker
+  var CW_ENDPOINT = 'https://ranobevault-contact.non-admin.workers.dev/message'; // <-- set after deploying the Cloudflare Worker
 
   var fab = document.getElementById('cwFab');
   var overlay = document.getElementById('cwOverlay');
@@ -623,6 +674,26 @@ var CW_ENDPOINT = 'https://ranobevault-contact.non-admin.workers.dev/message'; /
   var count = document.getElementById('cwCount');
   var usernameInput = document.getElementById('cwUsername');
   var successSub = document.getElementById('cwSuccessSub');
+  var statusToggle = document.getElementById('cwStatusToggle');
+  var statusView = document.getElementById('cwStatusView');
+  var statusBack = document.getElementById('cwStatusBack');
+  var ticketInput = document.getElementById('cwTicketInput');
+  var checkBtn = document.getElementById('cwCheckBtn');
+  var checkSpin = document.getElementById('cwCheckSpin');
+  var statusResult = document.getElementById('cwStatusResult');
+  var ticketIdEl = document.getElementById('cwTicketId');
+  var ticketCopyBtn = document.getElementById('cwTicketCopy');
+
+  var REASON_LABELS = {
+    fix_chapter: 'Fix a Chapter', request_translation: 'Request a Translation',
+    report_bug: 'Report a Bug', suggest_series: 'Suggest a Series',
+    feedback: 'General Feedback', other: 'Other'
+  };
+  var STATUS_LABELS = {
+    unread: "Received — hasn't been looked at yet.",
+    read: "Seen — it's on the list.",
+    resolved: "Resolved!"
+  };
 
   var REASON_SUCCESS = {
     fix_chapter: "Thanks for flagging it \u2014 I'll take a look and aim to have it fixed within 24 hours.",
@@ -672,6 +743,66 @@ var CW_ENDPOINT = 'https://ranobevault-contact.non-admin.workers.dev/message'; /
     overlay.classList.remove('cw-open');
     document.body.style.overflow = '';
   }
+  function showStatusView(){
+    form.classList.add('cw-hide');
+    statusView.classList.add('cw-show');
+    statusResult.innerHTML = '';
+    setTimeout(function(){ ticketInput.focus(); }, 100);
+  }
+  function showFormView(){
+    statusView.classList.remove('cw-show');
+    form.classList.remove('cw-hide');
+  }
+  statusToggle.addEventListener('click', showStatusView);
+  statusBack.addEventListener('click', showFormView);
+
+  ticketCopyBtn.addEventListener('click', function(){
+    var id = ticketIdEl.textContent;
+    if (!id) return;
+    var done = function(){ ticketCopyBtn.textContent = 'Copied!'; setTimeout(function(){ ticketCopyBtn.textContent = 'Copy'; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(id).then(done).catch(function(){});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = id; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(e){}
+      document.body.removeChild(ta);
+    }
+  });
+
+  checkBtn.addEventListener('click', function(){
+    var id = ticketInput.value.trim();
+    statusResult.innerHTML = '';
+    if (!id) return;
+
+    checkBtn.disabled = true;
+    checkSpin.style.display = 'inline-block';
+
+    var statusUrl = CW_ENDPOINT + '/' + encodeURIComponent(id) + '/status';
+    fetch(statusUrl).then(function(res){
+      if (res.status === 404) throw new Error('not_found');
+      if (!res.ok) throw new Error('error');
+      return res.json();
+    }).then(function(data){
+      var badgeClass = data.status || 'unread';
+      var reasonLabel = REASON_LABELS[data.reason] || 'Other';
+      var statusMsg = STATUS_LABELS[data.status] || '';
+      var when = '';
+      try { when = new Date(data.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); } catch(e){}
+      statusResult.innerHTML =
+        '<div class="cw-status-pill-row"><span class="cw-status-badge ' + badgeClass + '">' + badgeClass + '</span></div>' +
+        '<div class="cw-status-meta">' + statusMsg + '<br>Re: ' + reasonLabel + (when ? ' &middot; sent ' + when : '') + '</div>';
+    }).catch(function(err){
+      var msg = err && err.message === 'not_found'
+        ? "No message found with that ticket ID — double check and try again."
+        : "Couldn't check status — try again in a moment.";
+      statusResult.innerHTML = '<div class="cw-status-error">' + msg + '</div>';
+    }).finally(function(){
+      checkBtn.disabled = false;
+      checkSpin.style.display = 'none';
+    });
+  });
+
   fab.addEventListener('click', openPanel);
   closeBtn.addEventListener('click', closePanel);
   overlay.addEventListener('click', function(e){ if (e.target === overlay) closePanel(); });
@@ -681,6 +812,9 @@ var CW_ENDPOINT = 'https://ranobevault-contact.non-admin.workers.dev/message'; /
     form.classList.remove('cw-hide');
     success.classList.remove('cw-show');
     errorBox.classList.remove('cw-show');
+    statusView.classList.remove('cw-show');
+    ticketInput.value = '';
+    statusResult.innerHTML = '';
   }
 
   form.addEventListener('submit', function(e){
@@ -720,8 +854,9 @@ var CW_ENDPOINT = 'https://ranobevault-contact.non-admin.workers.dev/message'; /
     }).then(function(res){
       if (!res.ok) throw new Error('bad status');
       return res.json();
-    }).then(function(){
+    }).then(function(data){
       successSub.textContent = REASON_SUCCESS[reason] || REASON_SUCCESS.other;
+      ticketIdEl.textContent = (data && data.id) || '';
       form.classList.add('cw-hide');
       success.classList.add('cw-show');
       form.reset();
