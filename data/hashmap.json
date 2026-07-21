@@ -1209,6 +1209,17 @@
     "file": "NEKHt2ri7.json",
     "locked": false,
     "prev": "taLC8jaYB",
-    "next": null
+    "next": "pc5bekecd"
+  },
+  "pc5bekecd": {
+    "series": "chained-soldier-demon-defense-force-journal",
+    "volume": 1,
+    "chapter": 5,
+    "file": "pc5bekecd.json",
+    "locked": true,
+    "prev": "NEKHt2ri7",
+    "next": null,
+    "adwallUrl": "https://link-target.net/5798120/icEzrs2NOJo2",
+    "unlockKey": "uk_4hLuZPvAxh"
   }
 }
