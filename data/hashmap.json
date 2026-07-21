@@ -1102,7 +1102,7 @@
     "file": "nEFFePcxV.json",
     "locked": true,
     "prev": "943LqY3tb",
-    "next": null,
+    "next": "taLC8jaYB",
     "adwallUrl": "https://link-center.net/5798120/JoafN8DbNAhw",
     "unlockKey": "uk_rAQN3K9k6g"
   },
@@ -1192,5 +1192,14 @@
     "next": null,
     "adwallUrl": "https://link-target.net/5798120/sUPerVh14Omu",
     "unlockKey": "uk_W3qnYqrYjh"
+  },
+  "taLC8jaYB": {
+    "series": "chained-soldier-demon-defense-force-journal",
+    "volume": 1,
+    "chapter": 4,
+    "file": "taLC8jaYB.json",
+    "locked": false,
+    "prev": "nEFFePcxV",
+    "next": null
   }
 }
