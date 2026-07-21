@@ -35,6 +35,13 @@
       "title": "Chapter 2: 7th Squad Edition 2",
       "hash": "NEKHt2ri7",
       "locked": false
+    },
+    {
+      "volume": 1,
+      "chapter": 5,
+      "title": "Chapter 2: 7th Squad Edition 3",
+      "hash": "pc5bekecd",
+      "locked": true
     }
   ]
 }
