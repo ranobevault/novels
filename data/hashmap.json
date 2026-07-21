@@ -1200,6 +1200,15 @@
     "file": "taLC8jaYB.json",
     "locked": false,
     "prev": "nEFFePcxV",
+    "next": "NEKHt2ri7"
+  },
+  "NEKHt2ri7": {
+    "series": "chained-soldier-demon-defense-force-journal",
+    "volume": 1,
+    "chapter": 5,
+    "file": "NEKHt2ri7.json",
+    "locked": false,
+    "prev": "taLC8jaYB",
     "next": null
   }
 }
