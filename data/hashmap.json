@@ -1287,6 +1287,15 @@
     "file": "PYjMNYLkx.json",
     "locked": false,
     "prev": "CbuRvb0jM",
+    "next": "GpIKtetXH"
+  },
+  "GpIKtetXH": {
+    "series": "dragon-gal-s-nail-artist",
+    "volume": 1,
+    "chapter": 14,
+    "file": "GpIKtetXH.json",
+    "locked": false,
+    "prev": "PYjMNYLkx",
     "next": null
   }
 }
