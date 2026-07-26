@@ -1,5 +1,13 @@
 [
   {
+    "series_id": "life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "title": "Life as an Adventurer with the Banished Marquis’ Daughter",
+    "cover": "https://ranobevault.github.io/novels/covers/Life-as-an-Adventurer-with-the-Banished-Marquis-Daughter-LN.jpg",
+    "reason": "Vol.2 Ch.3 added",
+    "url": "series.html?id=life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "timestamp": "2026-07-26T09:33:48.051Z"
+  },
+  {
     "series_id": "when-i-said-i-want-a-beautiful-and-rich-girlfriend-a-girl-with-circumstances-showed-up",
     "title": "When I Said, “I Want a Beautiful and Rich Girlfriend,” a Girl with Circumstances Showed Up",
     "cover": "https://ranobevault.github.io/novels/covers/xyklRI9SJ.jpeg",
@@ -150,13 +158,5 @@
     "reason": "Vol.1 Ch.13 added",
     "url": "series.html?id=dragon-gal-s-nail-artist",
     "timestamp": "2026-07-19T08:09:31.138Z"
-  },
-  {
-    "series_id": "dragon-gal-s-nail-artist",
-    "title": "Dragon Gal's Nail Artist",
-    "cover": "https://ranobevault.github.io/novels/covers/cover.jpg",
-    "reason": "Vol.1 Ch.12 added",
-    "url": "series.html?id=dragon-gal-s-nail-artist",
-    "timestamp": "2026-07-19T08:05:21.342Z"
   }
 ]
