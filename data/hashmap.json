@@ -1381,6 +1381,17 @@
     "file": "e9baCHU35.json",
     "locked": false,
     "prev": "6qb8e3VtK",
-    "next": null
+    "next": "jgK1UqAey"
+  },
+  "jgK1UqAey": {
+    "series": "chained-soldier-demon-defense-force-journal",
+    "volume": 1,
+    "chapter": 6,
+    "file": "jgK1UqAey.json",
+    "locked": true,
+    "prev": "e9baCHU35",
+    "next": null,
+    "adwallUrl": "https://link-hub.net/5798120/gCWruDPFPtpt",
+    "unlockKey": "uk_J32x8PaBhx"
   }
 }
