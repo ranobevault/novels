@@ -1372,6 +1372,15 @@
     "file": "6qb8e3VtK.json",
     "locked": false,
     "prev": "pc5bekecd",
+    "next": "e9baCHU35"
+  },
+  "e9baCHU35": {
+    "series": "chained-soldier-demon-defense-force-journal",
+    "volume": 1,
+    "chapter": 6,
+    "file": "e9baCHU35.json",
+    "locked": false,
+    "prev": "6qb8e3VtK",
     "next": null
   }
 }
