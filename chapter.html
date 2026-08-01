@@ -269,9 +269,10 @@
     display: inline;
   }
   ._jnk {
-    /* real, non-zero bounding box so rect-based "is this element visible"
-       filters don't flag it, but visually unreadable */
-    opacity: 0.02;
+    font-size: 0.4em;
+    color: var(--reader-bg);
+    -webkit-text-fill-color: var(--reader-bg);
+    text-shadow: none;
     user-select: text;
   }
   .page-1 .chapter-body p:first-child::first-letter {
@@ -585,14 +586,15 @@ const WATERMARKS = [
 ];
 function watermarkSpan() {
   const phrase = WATERMARKS[Math.floor(Math.random() * WATERMARKS.length)];
-  // Kept as real, in-flow, non-zero-rect text (never display:none / 0x0 /
-  // off-screen absolute) — those are excluded from the Selection API
-  // entirely, so a plain Ctrl+C never picked them up in the first place,
-  // regardless of what "Allow Copy" style extensions unlock.
+  // Text color matched to the reader background — real, non-zero rect,
+  // opacity:1, display:inline (so naive "is this hidden" checks pass it
+  // right by), but genuinely invisible to the eye since it's the same
+  // color as the page behind it. Never display:none/0x0/off-screen —
+  // those are excluded from the Selection API entirely, so plain Ctrl+C
+  // never picked them up in the first place, extension or not.
   const styles = [
-    'opacity:0.02',
-    'color:inherit;opacity:0.03;letter-spacing:-1px',
-    'font-size:inherit;opacity:0.02;text-decoration:none',
+    'color:var(--reader-bg);-webkit-text-fill-color:var(--reader-bg);font-size:0.4em',
+    'color:var(--reader-bg);-webkit-text-fill-color:var(--reader-bg);font-size:0.35em;letter-spacing:-0.5px',
   ];
   const style = styles[Math.floor(Math.random() * styles.length)];
   return ` <span aria-hidden="true" style="${style}">${phrase}</span> `;
