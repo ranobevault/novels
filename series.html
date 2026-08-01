@@ -252,6 +252,7 @@ let activeVol = 'all';
 let seriesLatestVolume = 1;
 
 var HASHMAP_ENDPOINT = 'https://ranobevault-chapters.non-admin.workers.dev/hashmap'; // <-- same chapter-gateway Worker as chapter.html, just the /hashmap route
+var INDEX_ENDPOINT = HASHMAP_ENDPOINT.replace(/\/hashmap$/, '/index'); // auto-derived, no separate URL to set — serves data/chapters/{series}-index.json from the private repo
 
 if (!seriesId) { location.href = 'index.html'; }
 
@@ -259,7 +260,7 @@ async function init() {
   try {
     const [seriesRes, chaptersRes, hashmapRes] = await Promise.all([
       fetch('data/series.json'),
-      fetch(`data/chapters/${seriesId}-index.json`).catch(() => null),
+      fetch(`${INDEX_ENDPOINT}?series=${encodeURIComponent(seriesId)}`).catch(() => null),
       fetch(HASHMAP_ENDPOINT).catch(() => null)
     ]);
     const allSeries = await seriesRes.json();
