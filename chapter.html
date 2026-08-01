@@ -269,11 +269,10 @@
     display: inline;
   }
   ._jnk {
-    font-size: 0.4em;
-    color: var(--reader-bg);
-    -webkit-text-fill-color: var(--reader-bg);
-    text-shadow: none;
-    user-select: text;
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    white-space: nowrap;
   }
   .page-1 .chapter-body p:first-child::first-letter {
     font-size: 3em; line-height: 0.8;
@@ -586,18 +585,13 @@ const WATERMARKS = [
 ];
 function watermarkSpan() {
   const phrase = WATERMARKS[Math.floor(Math.random() * WATERMARKS.length)];
-  // Text color matched to the reader background — real, non-zero rect,
-  // opacity:1, display:inline (so naive "is this hidden" checks pass it
-  // right by), but genuinely invisible to the eye since it's the same
-  // color as the page behind it. Never display:none/0x0/off-screen —
-  // those are excluded from the Selection API entirely, so plain Ctrl+C
-  // never picked them up in the first place, extension or not.
-  const styles = [
-    'color:var(--reader-bg);-webkit-text-fill-color:var(--reader-bg);font-size:0.4em',
-    'color:var(--reader-bg);-webkit-text-fill-color:var(--reader-bg);font-size:0.35em;letter-spacing:-0.5px',
-  ];
-  const style = styles[Math.floor(Math.random() * styles.length)];
-  return ` <span aria-hidden="true" style="${style}">${phrase}</span> `;
+  // Pulled out of flow entirely (position:absolute, no clip/zero-size) —
+  // takes zero space in the paragraph so it can't distort word spacing,
+  // and stays fully selectable/copyable since the box still renders,
+  // just off-canvas. display:none/0x0/clip(0,0,0,0) would be excluded
+  // from the Selection API outright, so a plain Ctrl+C would never even
+  // pick it up — that's the mistake the old CSS was making.
+  return ` <span aria-hidden="true" style="position:absolute;left:-9999px;white-space:nowrap">${phrase}</span> `;
 }
 
 // ── Unicode poison pool ──────────────────────────────────────────────────────
@@ -704,9 +698,9 @@ function obfuscatePara(text, scramble) {
   const processedWords = words.map((word, i) => {
     if (!word) return '';
     // Visible word is completely untouched — renders perfectly on screen.
-    // Junk lives in a real, in-flow, non-zero-rect span (see ._jnk CSS)
-    // so it can't be filtered out by any "is this element hidden" check,
-    // yet it's visually imperceptible.
+    // Junk lives in an off-flow span (position:absolute, no clip/zero-size
+    // — see ._jnk CSS) so it takes zero layout space and can't distort
+    // word spacing, but is still a real selectable text node.
     const ascii = randJunk(4 + Math.floor(Math.random() * 5));
     const poison = poisonChars();
     const glyphed = applyHomoglyphs(randJunk(3 + Math.floor(Math.random() * 4)));
