@@ -255,6 +255,25 @@
     text-align: justify;
     transition: font-size 0.2s, color 0.3s;
   }
+  /* Words are shuffled in DOM order (see scrambleWords()) and re-sequenced
+     visually via flex `order`. Selection/copy always follows DOM order,
+     so this only affects what gets pasted — reading flow is untouched. */
+  .chapter-body p.scrambled {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: left;
+    row-gap: 0;
+    column-gap: 0.28em;
+  }
+  .chapter-body p.scrambled span._w {
+    display: inline;
+  }
+  ._jnk {
+    /* real, non-zero bounding box so rect-based "is this element visible"
+       filters don't flag it, but visually unreadable */
+    opacity: 0.02;
+    user-select: text;
+  }
   .page-1 .chapter-body p:first-child::first-letter {
     font-size: 3em; line-height: 0.8;
     float: left; margin: 0.05em 0.1em 0 0;
@@ -290,24 +309,17 @@
   .nav-chapter-btn.disabled { opacity: 0.35; pointer-events: none; }
   .nav-label { font-size: 0.68rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
   .nav-ch-title { font-size: 0.82rem; font-weight: 700; }
-  ._jnk {
-    display: none !important;
-    font-size: 0 !important;
-    line-height: 0 !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
-    speak: none !important;
-  }
-
-  /* ANTI-COPY */
+  /* NOTE: user-select:none below does nothing against copy-unlocking
+     extensions (they override this trivially) — it's left only because
+     it costs nothing and blocks the rare manual right-click-copy user.
+     The real defenses are the ._jnk real-rect junk spans (see above) and
+     the DOM/visual order split on .scrambled paragraphs. */
   .chapter-body, .chapter-title, .chapter-wrap {
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-    user-select: none !important;
-    -webkit-touch-callout: none !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
   /* Override SweetAlert2 to match RanobeVault theme */
   .swal2-popup.ranobe-alert {
@@ -573,11 +585,14 @@ const WATERMARKS = [
 ];
 function watermarkSpan() {
   const phrase = WATERMARKS[Math.floor(Math.random() * WATERMARKS.length)];
+  // Kept as real, in-flow, non-zero-rect text (never display:none / 0x0 /
+  // off-screen absolute) — those are excluded from the Selection API
+  // entirely, so a plain Ctrl+C never picked them up in the first place,
+  // regardless of what "Allow Copy" style extensions unlock.
   const styles = [
-    'display:none',
-    'font-size:0;line-height:0;color:transparent',
-    'position:absolute;width:0;height:0;overflow:hidden;clip:rect(0,0,0,0)',
-    'font-size:0;color:transparent;position:absolute;left:-9999px',
+    'opacity:0.02',
+    'color:inherit;opacity:0.03;letter-spacing:-1px',
+    'font-size:inherit;opacity:0.02;text-decoration:none',
   ];
   const style = styles[Math.floor(Math.random() * styles.length)];
   return ` <span aria-hidden="true" style="${style}">${phrase}</span> `;
@@ -665,22 +680,35 @@ function poisonWord(word) {
   }
 }
 
-function obfuscatePara(text) {
+// Shuffles word DOM order while preserving visual order via CSS `order`.
+// Selection/copy always walks the DOM, never computed flex order, so a
+// pasted paragraph comes out with its words scrambled even though it
+// reads perfectly normally on screen. Requires the parent <p> to have
+// class="scrambled" (display:flex; flex-wrap:wrap) — see CSS.
+function scrambleWords(items) {
+  const indexed = items.map((html, i) => ({ html, order: i }));
+  for (let i = indexed.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
+  }
+  return indexed.map(({ html, order }) =>
+    `<span class="_w" style="order:${order}">${html}</span>`
+  ).join('');
+}
+
+function obfuscatePara(text, scramble) {
   const esc = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const words = esc.split(' ');
   const processedWords = words.map((word, i) => {
     if (!word) return '';
     // Visible word is completely untouched — renders perfectly on screen.
-    // All poison is stuffed inside display:none / zero-size spans.
-    // Reader mode and scrapers extract the span content too, getting garbage.
-    const style = i % 2 === 0
-      ? `display:none`
-      : `font-size:0;color:transparent;position:absolute`;
-    // Span content: random ASCII + invisible Unicode + homoglyph-swapped junk
+    // Junk lives in a real, in-flow, non-zero-rect span (see ._jnk CSS)
+    // so it can't be filtered out by any "is this element hidden" check,
+    // yet it's visually imperceptible.
     const ascii = randJunk(4 + Math.floor(Math.random() * 5));
     const poison = poisonChars();
     const glyphed = applyHomoglyphs(randJunk(3 + Math.floor(Math.random() * 4)));
-    return `${word}<span aria-hidden="true" style="${style}" class="_jnk">${poison}${ascii}${glyphed}</span>`;
+    return `${word}<span aria-hidden="true" class="_jnk">${poison}${ascii}${glyphed}</span>`;
   });
 
   // Splice in a watermark landmine at a random word boundary in ~1 of 8 paragraphs.
@@ -689,12 +717,16 @@ function obfuscatePara(text) {
     processedWords.splice(idx, 0, watermarkSpan());
   }
 
-  return processedWords.join(' ');
+  // Word-order scrambling is skipped for the very first paragraph so the
+  // drop-cap (::first-letter) and any search-engine preview text still
+  // work normally; every paragraph after that gets scrambled.
+  return scramble ? scrambleWords(processedWords) : processedWords.join(' ');
 }
 function processContent(paragraphs) {
   let html = '';
   let codeBuffer = [];
   let inCode = false;
+  let paraCount = 0;
   paragraphs.forEach(para => {
     if (para.startsWith('[img]')) {
       if (inCode) { html += `<pre>${codeBuffer.join('\n')}</pre>`; codeBuffer = []; inCode = false; }
@@ -708,7 +740,10 @@ function processContent(paragraphs) {
       inCode = true;
     } else {
       if (inCode) { html += `<pre>${codeBuffer.join('\n')}</pre>`; codeBuffer = []; inCode = false; }
-      html += `<p>${obfuscatePara(para)}</p>`;
+      const scramble = paraCount > 0;
+      const cls = scramble ? ' class="scrambled"' : '';
+      html += `<p${cls}>${obfuscatePara(para, scramble)}</p>`;
+      paraCount++;
     }
   });
   if (codeBuffer.length) html += `<pre>${codeBuffer.join('\n')}</pre>`;
