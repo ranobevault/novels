@@ -445,17 +445,30 @@
 
 <!-- GITHUB CONFIG -->
 <div class="config-bar">
-  <span class="config-label">GitHub:</span>
+  <span class="config-label">Public site repo:</span>
   <input class="config-input wide" id="gh-owner" placeholder="username" title="GitHub username">
   <span class="config-label">/</span>
   <input class="config-input wide" id="gh-repo" placeholder="repo-name" title="Repository name">
   <span class="config-label">Branch:</span>
   <input class="config-input" id="gh-branch" placeholder="main" style="width:80px" title="Branch">
   <span class="config-label">Token:</span>
-  <input class="config-input wide" id="gh-token" type="password" placeholder="ghp_..." title="Personal Access Token">
+  <input class="config-input wide" id="gh-token" type="password" placeholder="ghp_..." title="Personal Access Token (only needs write access to THIS repo)">
   <button class="btn-sm" onclick="testGithub()">Test</button>
   <button class="btn-sm primary" onclick="saveConfig()">Save</button>
   <span class="config-status" id="gh-status"></span>
+</div>
+<div class="config-bar" style="border-top:1px dashed var(--border)">
+  <span class="config-label">Private chapters repo:</span>
+  <input class="config-input wide" id="gh-owner-priv" placeholder="username" title="GitHub username">
+  <span class="config-label">/</span>
+  <input class="config-input wide" id="gh-repo-priv" placeholder="repo-name-private" title="Private repository name (data/chapters + hashmap.json live here)">
+  <span class="config-label">Branch:</span>
+  <input class="config-input" id="gh-branch-priv" placeholder="main" style="width:80px" title="Branch">
+  <span class="config-label">Token:</span>
+  <input class="config-input wide" id="gh-token-priv" type="password" placeholder="ghp_..." title="Personal Access Token (only needs write access to the PRIVATE repo)">
+  <button class="btn-sm" onclick="testGithubPrivate()">Test</button>
+  <button class="btn-sm primary" onclick="saveConfigPrivate()">Save</button>
+  <span class="config-status" id="gh-status-priv"></span>
 </div>
 
 <div class="admin-layout">
@@ -997,8 +1010,74 @@ async function testGithub() {
   } catch(e) { status.textContent = '✗ Network error'; status.className = 'config-status err'; }
 }
 
+// ========== PRIVATE REPO CONFIG (chapters + hashmap.json) ==========
+// Anything under data/chapters/ and data/hashmap.json is routed to this repo instead of
+// the public site repo above. Keep this repo PRIVATE on GitHub — that's what actually
+// keeps chapter text from being scraped/cloned; the Worker is just the read bridge for readers.
+function saveConfigPrivate() {
+  const cfg = {
+    owner: document.getElementById('gh-owner-priv').value.trim(),
+    repo: document.getElementById('gh-repo-priv').value.trim(),
+    branch: document.getElementById('gh-branch-priv').value.trim() || 'main',
+    token: document.getElementById('gh-token-priv').value.trim()
+  };
+  localStorage.setItem('ns_gh_config_private', JSON.stringify(cfg));
+  document.getElementById('gh-status-priv').textContent = '✓ Saved';
+  document.getElementById('gh-status-priv').className = 'config-status ok';
+}
+
+function loadConfigPrivate() {
+  const saved = localStorage.getItem('ns_gh_config_private');
+  if (!saved) return null;
+  const cfg = JSON.parse(saved);
+  document.getElementById('gh-owner-priv').value = cfg.owner || '';
+  document.getElementById('gh-repo-priv').value = cfg.repo || '';
+  document.getElementById('gh-branch-priv').value = cfg.branch || 'main';
+  document.getElementById('gh-token-priv').value = cfg.token || '';
+  return cfg;
+}
+
+function getConfigPrivate() {
+  const cfg = JSON.parse(localStorage.getItem('ns_gh_config_private') || '{}');
+  if (!cfg.owner || !cfg.repo || !cfg.token) {
+    alert('Please fill in the private chapters repo owner, repo, and token first, then click Save.');
+    return null;
+  }
+  cfg.branch = cfg.branch || 'main';
+  return cfg;
+}
+
+async function testGithubPrivate() {
+  const cfg = getConfigPrivate(); if (!cfg) return;
+  const status = document.getElementById('gh-status-priv');
+  status.textContent = 'Testing...'; status.className = 'config-status';
+  try {
+    const res = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}`, {
+      headers: { Authorization: `token ${cfg.token}` }
+    });
+    if (res.ok) { status.textContent = '✓ Connected'; status.className = 'config-status ok'; }
+    else { status.textContent = `✗ ${res.status}`; status.className = 'config-status err'; }
+  } catch(e) { status.textContent = '✗ Network error'; status.className = 'config-status err'; }
+}
+
+// Paths that belong in the private chapters repo instead of the public site repo.
+function isPrivatePath(path) {
+  return path === 'data/hashmap.json' || path.startsWith('data/chapters/');
+}
+
+// Every ghGetFile/ghPutFile/ghGetJSON call site in this file still passes the public `cfg` —
+// this swaps in the private repo config transparently whenever the path is chapter/hashmap data,
+// so nothing else below needed to change.
+function resolveCfg(cfg, path) {
+  if (!isPrivatePath(path)) return cfg;
+  const priv = getConfigPrivate();
+  if (!priv) throw new Error('Private chapters repo is not configured — fill it in above and click Save.');
+  return priv;
+}
+
 // ========== GITHUB API ==========
 async function ghGetFile(cfg, path) {
+  cfg = resolveCfg(cfg, path);
   const res = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}?ref=${cfg.branch}`, {
     headers: { Authorization: `token ${cfg.token}` }
   });
@@ -1008,6 +1087,7 @@ async function ghGetFile(cfg, path) {
 }
 
 async function ghPutFile(cfg, path, content, message, sha) {
+  cfg = resolveCfg(cfg, path);
   const body = {
     message,
     content: btoa(unescape(encodeURIComponent(content))),
@@ -2701,6 +2781,7 @@ document.querySelectorAll('.tab-item').forEach(item => {
 
 // ========== INIT ==========
 loadConfig();
+loadConfigPrivate();
 msgLoadConfig();
 loadMessages(true); // quietly populate the unread badge if config is already saved
 </script>
