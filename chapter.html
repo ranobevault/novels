@@ -237,14 +237,59 @@
   }
   .chapter-divider span { font-size: 0.7rem; letter-spacing: 0.15em; }
 
+  /* ── IMPROVED ILLUSTRATION SIZING ───────────────────────────────────────── */
   .chapter-illustration {
-    margin: 0.5em 0; text-align: center;
+    margin: 1em 0;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: auto;
   }
+
   .chapter-illustration img {
-    max-width: 100%; max-height: 38vh;
-    object-fit: contain; border-radius: 4px;
-    display: block; margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+    /* Responsive: 55vh on desktop, 65vh on mobile */
+    max-height: clamp(200px, 55vh, 520px);
+    object-fit: contain;
+    border-radius: 4px;
+    display: block;
+    margin: 0 auto;
+    image-rendering: crisp-edges;
+    transition: max-height 0.3s ease;
   }
+
+  @media (max-width: 640px) {
+    .chapter-illustration img {
+      max-height: clamp(160px, 65vh, 400px);
+      margin: 0.8em auto;
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .chapter-illustration img {
+      max-height: clamp(240px, 55vh, 450px);
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .chapter-illustration img {
+      max-height: clamp(280px, 50vh, 520px);
+    }
+  }
+
+  .chapter-illustration.fullpage img {
+    max-height: 70vh;
+    width: auto;
+    max-width: 95%;
+  }
+
+  .chapter-illustration.inline img {
+    max-height: 30vh;
+    max-width: 85%;
+  }
+  /* ────────────────────────────────────────────────────────────────────────── */
 
   .chapter-body p {
     font-family: 'Crimson Pro', Georgia, serif;
@@ -718,16 +763,22 @@ function obfuscatePara(text, scramble) {
   // work normally; every paragraph after that gets scrambled.
   return scramble ? scrambleWords(processedWords) : processedWords.join(' ');
 }
+
 function processContent(paragraphs) {
   let html = '';
   let codeBuffer = [];
   let inCode = false;
   let paraCount = 0;
-  paragraphs.forEach(para => {
+  paragraphs.forEach((para, idx) => {
     if (para.startsWith('[img]')) {
       if (inCode) { html += `<pre>${codeBuffer.join('\n')}</pre>`; codeBuffer = []; inCode = false; }
       const url = para.slice(5).trim();
-      html += `<figure class="chapter-illustration"><img src="${url}" alt="Illustration" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>`;
+      // ── IMPROVED IMAGE CLASSIFICATION ──────────────────────────────────
+      // Classify as full-page or inline based on context
+      const isFullPage = paragraphs.length < 5 || idx === 0 || idx === paragraphs.length - 1;
+      const className = isFullPage ? 'fullpage' : 'inline';
+      html += `<figure class="chapter-illustration ${className}"><img src="${url}" alt="Illustration" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>`;
+      // ──────────────────────────────────────────────────────────────────
       return;
     }
     const isCode = para.startsWith('>') || para.startsWith('spell ') || para.startsWith('//') || para.startsWith('NAME:') || para.startsWith('SYSTEM');
@@ -750,71 +801,84 @@ function processContent(paragraphs) {
 let allPages = [];
 let currentPage = 0;
 
-// Estimate paragraphs per page based on viewport height and font size
-function calcParasPerPage() {
-  const fontSize = parseInt(localStorage.getItem('fontSize') || '17');
-  const lineHeight = 1.85;
-  const paraSpacing = fontSize * 1.1; // margin-bottom ~1.1em
-  const lineHeightPx = fontSize * lineHeight;
-  const avgLinesPerPara = 3.5; // average paragraph height
-  const paraHeightPx = (avgLinesPerPara * lineHeightPx) + paraSpacing;
-  const topBarHeight = 54 + 2; // top bar + progress bar
-  const footerHeight = 44; // page footer
-  const headerHeight = 120; // chapter header on page 1 (only affects p1)
-  const availableHeight = window.innerHeight - topBarHeight - footerHeight - 40; // 40px padding
-  return Math.max(3, Math.floor(availableHeight / paraHeightPx));
-}
-
+// ── IMPROVED EPUB-LIKE PAGINATION ────────────────────────────────────────────
 function buildPages(paragraphs) {
-  // Calculate available reading height in pixels:
-  //   total viewport - top bar (54px) - page-header (~34px) - page-footer (~44px) - padding (28px)
-  const topBar     = 54;
-  const pageHeader = 34;
+  const fs = parseInt(localStorage.getItem('reader_fontsize') || '17');
+  const lineH = fs * 1.85;
+  const paraMargin = fs * 0.7;
+
+  // Calculate available space more accurately
+  const topBar = 54;
+  const pageHeader = 42;
   const pageFooter = 44;
-  const padding    = 28;
-  const availH = window.innerHeight - topBar - pageHeader - pageFooter - padding;
+  const padding = 12 + 28;
+  
+  const contentWidth = Math.min(window.innerWidth - 44, 680);
+  const availableHeight = window.innerHeight - topBar - pageHeader - pageFooter - padding;
+  
+  // Character width calculation based on actual content width
+  const charWidth = fs * 0.52;
+  const charsPerLine = Math.floor(contentWidth / charWidth);
 
-  // Estimate how many characters fit per line based on viewport width and font size.
-  // Font size is stored in `fontSize` (default 16px), line-height 1.85.
-  const fs = typeof fontSize !== 'undefined' ? fontSize : 16;
-  const lineH        = fs * 1.85;
-  const charsPerLine = Math.floor((Math.min(window.innerWidth, 680) - 44) / (fs * 0.52));
-  const paraMargin   = fs * 0.7; // matches margin-bottom: 0.7em
+  // Better paragraph height estimation
+  function estimateParaHeight(text) {
+    // Images with responsive sizing
+    if (text.startsWith('[img]')) {
+      const isMobile = window.innerWidth < 640;
+      const maxImgHeight = isMobile 
+        ? Math.min(availableHeight * 0.65, 400) 
+        : Math.min(availableHeight * 0.55, 500);
+      return maxImgHeight + (fs * 0.5);
+    }
 
-  // Estimate pixel height of a paragraph given its text length
-  function paraHeight(text) {
-    if (text.startsWith('[img]')) return Math.min(window.innerWidth * 0.75, 320); // illustration estimate
-    const isCode = text.startsWith('>') || text.startsWith('//') ||
-      text.startsWith('NAME:') || text.startsWith('SYSTEM') || text.startsWith('spell ');
-    const lines = isCode
-      ? text.split('\n').length
-      : Math.ceil(text.length / charsPerLine) || 1;
+    // Code blocks
+    if (text.startsWith('>') || text.startsWith('//') || 
+        text.startsWith('NAME:') || text.startsWith('SYSTEM') || text.startsWith('spell ')) {
+      const lines = text.split('\n').length;
+      return (lines * lineH) + (fs * 0.5) + paraMargin;
+    }
+
+    // Regular paragraphs
+    if (!text.trim()) return fs * 0.5;
+    const lines = Math.max(1, Math.ceil(text.length / charsPerLine));
     return (lines * lineH) + paraMargin;
   }
 
+  // Build pages with orphan/widow prevention
   const pages = [];
-  let buf = [];
-  let usedH = 0;
+  let currentPageBuffer = [];
+  let currentPageHeight = 0;
 
-  paragraphs.forEach(para => {
-    const h = paraHeight(para);
-    const realParas = buf.filter(p =>
+  paragraphs.forEach((para) => {
+    const paraHeight = estimateParaHeight(para);
+    const totalWithNewPara = currentPageHeight + paraHeight;
+    const contentParas = currentPageBuffer.filter(p =>
       !p.startsWith('>') && !p.startsWith('//') && !p.startsWith('NAME:') &&
       !p.startsWith('SYSTEM') && !p.startsWith('spell ') && !p.startsWith('[img]'));
 
-    // If adding this paragraph would overflow AND we already have content, flush
-    if (usedH + h > availH && realParas.length >= 1) {
-      pages.push([...buf]);
-      buf = [para];
-      usedH = h;
+    const isShortContent = paraHeight < lineH * 3;
+    const hasContentOnPage = contentParas.length > 0;
+
+    if (totalWithNewPara > availableHeight && hasContentOnPage) {
+      // Avoid widow: keep short content with previous if it fits
+      if (isShortContent && currentPageHeight + paraHeight < availableHeight * 1.15) {
+        currentPageBuffer.push(para);
+        currentPageHeight += paraHeight;
+      } else {
+        if (currentPageBuffer.length > 0) pages.push([...currentPageBuffer]);
+        currentPageBuffer = [para];
+        currentPageHeight = paraHeight;
+      }
     } else {
-      buf.push(para);
-      usedH += h;
+      currentPageBuffer.push(para);
+      currentPageHeight += paraHeight;
     }
   });
-  if (buf.length) pages.push(buf);
-  return pages;
+
+  if (currentPageBuffer.length > 0) pages.push(currentPageBuffer);
+  return pages.length > 0 ? pages : [paragraphs];
 }
+// ────────────────────────────────────────────────────────────────────────────
 
 // ── Page preload cache ────────────────────────────────────────────────────────
 // Pre-renders adjacent pages into a Map so renderPage can swap instantly.
@@ -936,29 +1000,31 @@ function renderPage(pageIndex) {
       <div class="page-counter">Page <strong>${pageIndex + 1}</strong> / ${allPages.length}</div>
     </div>`;
 
-  // Tap detection on page-view: short tap with minimal movement = page turn.
-  // Left 30% = prev, right 30% = next. Center 40% = ignored (text selection area).
-  // Scroll events are unaffected since we only act on touchend with no movement.
+  // ── IMPROVED TOUCH DETECTION WITH DURATION CHECK ────────────────────────
   const pv = wrap.querySelector('.page-view');
   if (pv) {
-    let tapStartX = 0, tapStartY = 0, tapStartScroll = 0;
+    let tapStartX = 0, tapStartY = 0, tapStartScroll = 0, tapStartTime = 0;
     pv.addEventListener('touchstart', e => {
       tapStartX = e.touches[0].clientX;
       tapStartY = e.touches[0].clientY;
       tapStartScroll = pv.scrollTop;
+      tapStartTime = Date.now();
     }, { passive: true });
     pv.addEventListener('touchend', e => {
       const dx = Math.abs(e.changedTouches[0].clientX - tapStartX);
       const dy = Math.abs(e.changedTouches[0].clientY - tapStartY);
       const scrolled = Math.abs(pv.scrollTop - tapStartScroll);
-      // Only act if it was a genuine tap: barely moved finger, no scroll happened
-      if (dx < 12 && dy < 12 && scrolled < 8) {
+      const duration = Date.now() - tapStartTime;
+      
+      // True tap: minimal movement, quick release, no scroll, short duration
+      if (dx < 12 && dy < 12 && scrolled < 8 && duration < 250) {
         const xPct = tapStartX / window.innerWidth;
         if (xPct < 0.30 && currentPage > 0) renderPage(currentPage - 1);
         else if (xPct > 0.70 && currentPage < allPages.length - 1) renderPage(currentPage + 1);
       }
     }, { passive: true });
   }
+  // ────────────────────────────────────────────────────────────────────────
 
   if (isFirstPage) {
     fetch('data/series.json').then(r=>r.json()).then(series => {
@@ -1154,6 +1220,23 @@ function showError(title, msg) {
 }
 
 function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── AUTO-REPAGINATE ON WINDOW RESIZE ──────────────────────────────────────
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    if (chapterData && allPages.length > 0) {
+      const oldPage = currentPage;
+      pageCache.clear();
+      allPages = buildPages(chapterData.content || []);
+      // Restore to approximately the same position
+      const newPage = Math.min(oldPage, allPages.length - 1);
+      renderPage(newPage);
+    }
+  }, 300); // debounce to avoid excessive recalculation
+}, { passive: true });
+// ────────────────────────────────────────────────────────────────────────────
 
 init();
 // Show bookmark alert if user just completed an ad unlock
@@ -1719,12 +1802,12 @@ Thank you for supporting the website.
   };
 
   var REASON_SUCCESS = {
-    fix_chapter: "Thanks for flagging it \u2014 I'll take a look and aim to have it fixed within 24 hours.",
-    report_bug: "Thanks for the report \u2014 I'll take a look and aim to have it fixed within 24 hours.",
-    request_translation: "Noted! It's now on the list of series being considered for translation \u2014 no fixed timeline, but I'll keep it in mind.",
-    suggest_series: "Noted! It's now on the list of series being considered for translation \u2014 no fixed timeline, but I'll keep it in mind.",
-    feedback: "Thanks for the feedback \u2014 I read every message.",
-    other: "Thanks for reaching out \u2014 I read every message."
+    fix_chapter: "Thanks for flagging it — I'll take a look and aim to have it fixed within 24 hours.",
+    report_bug: "Thanks for the report — I'll take a look and aim to have it fixed within 24 hours.",
+    request_translation: "Noted! It's now on the list of series being considered for translation — no fixed timeline, but I'll keep it in mind.",
+    suggest_series: "Noted! It's now on the list of series being considered for translation — no fixed timeline, but I'll keep it in mind.",
+    feedback: "Thanks for the feedback — I read every message.",
+    other: "Thanks for reaching out — I read every message."
   };
 
   // Remember username across visits
