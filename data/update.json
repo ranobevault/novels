@@ -3,6 +3,14 @@
     "series_id": "valkyrie-bullet",
     "title": "Valkyrie Bullet",
     "cover": "https://i.imgur.com/b6Vd69k.jpeg",
+    "reason": "Vol.2 Ch.16 added",
+    "url": "series.html?id=valkyrie-bullet",
+    "timestamp": "2026-08-02T10:36:12.918Z"
+  },
+  {
+    "series_id": "valkyrie-bullet",
+    "title": "Valkyrie Bullet",
+    "cover": "https://i.imgur.com/b6Vd69k.jpeg",
     "reason": "Vol.2 Ch.15 added",
     "url": "series.html?id=valkyrie-bullet",
     "timestamp": "2026-08-02T10:21:48.348Z"
@@ -150,13 +158,5 @@
     "reason": "Vol.2 Ch.12 added",
     "url": "series.html?id=valkyrie-bullet",
     "timestamp": "2026-07-25T03:43:39.226Z"
-  },
-  {
-    "series_id": "i-a-holy-attributed-healer-am-surrounded-by-beautiful-big-b-easted-women-of-the-female-knight-brigade",
-    "title": "I’m a Holy-Attribute Healer, and Now I’m the Support Medic for an All-Female Knight Order!",
-    "cover": "https://ranobevault.github.io/novels/covers/h3id8wjs.jpg",
-    "reason": "Vol.1 Ch.9 added",
-    "url": "series.html?id=i-a-holy-attributed-healer-am-surrounded-by-beautiful-big-b-easted-women-of-the-female-knight-brigade",
-    "timestamp": "2026-07-22T12:57:45.917Z"
   }
 ]
