@@ -35,7 +35,6 @@
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  /* TOP BAR */
   .top-bar {
     position: sticky; top: 0; z-index: 100;
     background: rgba(13,13,18,0.92); backdrop-filter: blur(16px);
@@ -65,7 +64,6 @@
   }
   .top-btn:hover { color: var(--accent); background: rgba(200,169,110,0.1); }
 
-  /* SETTINGS PANEL */
   .settings-panel {
     position: fixed; top: 52px; right: 0; z-index: 99;
     background: var(--surface); border: 1px solid var(--border);
@@ -93,7 +91,6 @@
   }
   .mode-toggle:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* PROGRESS BAR */
   .progress-bar {
     position: fixed; top: 52px; left: 0; right: 0; z-index: 98;
     height: 2px; background: var(--border);
@@ -103,61 +100,37 @@
     width: 0%; transition: width 0.3s;
   }
 
-  /* PAGINATION */
   .page-view { animation: pageFadeIn 0.22s ease; }
   @keyframes pageFadeIn {
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  .page-nav {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; margin-top: 32px;
-    border-top: 1px solid var(--border); padding-top: 20px;
-  }
-  .page-btn {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text2); border-radius: var(--radius);
-    padding: 10px 20px; cursor: pointer;
-    font-family: 'Lato', sans-serif; font-size: 0.82rem;
-    transition: all 0.2s; min-width: 90px;
-  }
-  .page-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
-  .page-btn:disabled { opacity: 0.28; cursor: default; }
-  .page-counter {
-    font-size: 0.78rem; color: var(--text3);
-    letter-spacing: 0.1em; text-align: center; white-space: nowrap;
-  }
-  .page-counter strong { color: var(--accent); font-size: 0.95rem; }
 
-  /* EBOOK READER LAYOUT */
   body {
     background: var(--reader-bg); color: var(--reader-text);
     font-family: 'Lato', sans-serif;
-    height: 100vh; overflow: hidden; /* no body scroll */
+    height: 100vh; overflow: hidden;
     transition: background 0.3s, color 0.3s;
   }
 
-  /* Reading area fills exactly the space below the top bar */
   #content {
     position: fixed;
-    top: 54px; /* top-bar height + progress bar */
+    top: 54px;
     left: 0; right: 0;
     bottom: 0;
     overflow: hidden;
   }
 
-  /* The page wrapper fills the content area */
   .chapter-wrap {
     position: relative;
     width: 100%; height: 100%;
     display: flex; flex-direction: column;
   }
 
-  /* page-view takes remaining space after header */
   .page-view {
     flex: 1;
     overflow: hidden;
-    padding: 12px 22px 28px; /* bottom pad so text stays above floating indicator */
+    padding: 12px 22px 28px;
     max-width: 680px;
     width: 100%;
     margin: 0 auto;
@@ -165,12 +138,7 @@
     min-height: 0;
     box-sizing: border-box;
   }
-  @keyframes pageFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
 
-  /* Top page header bar */
   .page-header {
     flex-shrink: 0;
     display: flex; align-items: center; justify-content: space-between;
@@ -178,7 +146,6 @@
     border-bottom: 1px solid var(--border);
     max-width: 680px; width: 100%; margin: 0 auto;
   }
-  /* Pip dot row */
   .page-pip-counter {
     display: flex; align-items: center; gap: 5px;
     flex: 1; flex-wrap: wrap;
@@ -190,19 +157,17 @@
   }
   .pip-active { background: var(--accent); transform: scale(1.5); }
   .pip-ellipsis { opacity: 0.4; }
-  /* Minimal page number on right */
   .page-label {
     font-size: 0.68rem; color: var(--text3);
     white-space: nowrap; flex-shrink: 0;
     letter-spacing: 0.05em;
   }
 
-  /* Bottom page indicator — floating, transparent, bottom-right */
   .page-footer {
     position: absolute;
     bottom: 8px; right: 14px;
     z-index: 20;
-    pointer-events: none; /* never blocks taps */
+    pointer-events: none;
   }
   .page-counter {
     font-size: 0.68rem;
@@ -212,10 +177,8 @@
   }
   .page-counter strong { color: var(--accent); }
 
-  /* Hide old nav buttons — tap zones replace them */
   .page-nav { display: none; }
 
-  /* CHAPTER HEADER (page 1 only) */
   .chapter-header { margin-bottom: 20px; text-align: center; }
   .chapter-series {
     font-size: 0.72rem; color: var(--text3);
@@ -237,59 +200,60 @@
   }
   .chapter-divider span { font-size: 0.7rem; letter-spacing: 0.15em; }
 
-  /* ── IMPROVED ILLUSTRATION SIZING ───────────────────────────────────────── */
+  /* FULLPAGE ILLUSTRATIONS - 80vh CONSISTENT */
   .chapter-illustration {
-    margin: 1em 0;
+    margin: 0;
+    padding: 0;
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: auto;
+    width: 100%;
+    min-height: 80vh;
+    max-height: 85vh;
   }
 
   .chapter-illustration img {
-    width: 100%;
+    width: auto;
+    height: auto;
     max-width: 100%;
-    /* Responsive: 55vh on desktop, 65vh on mobile */
-    max-height: clamp(200px, 55vh, 520px);
+    max-height: 80vh;
     object-fit: contain;
-    border-radius: 4px;
+    border-radius: 0;
     display: block;
     margin: 0 auto;
     image-rendering: crisp-edges;
-    transition: max-height 0.3s ease;
   }
 
   @media (max-width: 640px) {
+    .chapter-illustration {
+      min-height: 75vh;
+      max-height: 80vh;
+    }
     .chapter-illustration img {
-      max-height: clamp(160px, 65vh, 400px);
-      margin: 0.8em auto;
+      max-height: 75vh;
     }
   }
 
   @media (min-width: 641px) and (max-width: 1024px) {
+    .chapter-illustration {
+      min-height: 78vh;
+      max-height: 82vh;
+    }
     .chapter-illustration img {
-      max-height: clamp(240px, 55vh, 450px);
+      max-height: 78vh;
     }
   }
 
   @media (min-width: 1025px) {
+    .chapter-illustration {
+      min-height: 80vh;
+      max-height: 85vh;
+    }
     .chapter-illustration img {
-      max-height: clamp(280px, 50vh, 520px);
+      max-height: 80vh;
     }
   }
-
-  .chapter-illustration.fullpage img {
-    max-height: 70vh;
-    width: auto;
-    max-width: 95%;
-  }
-
-  .chapter-illustration.inline img {
-    max-height: 30vh;
-    max-width: 85%;
-  }
-  /* ────────────────────────────────────────────────────────────────────────── */
 
   .chapter-body p {
     font-family: 'Crimson Pro', Georgia, serif;
@@ -300,9 +264,6 @@
     text-align: justify;
     transition: font-size 0.2s, color 0.3s;
   }
-  /* Words are shuffled in DOM order (see scrambleWords()) and re-sequenced
-     visually via flex `order`. Selection/copy always follows DOM order,
-     so this only affects what gets pasted — reading flow is untouched. */
   .chapter-body p.scrambled {
     display: flex;
     flex-wrap: wrap;
@@ -337,7 +298,6 @@
   }
   .light-mode .chapter-body pre { background: #f0ede6; color: #2a5a2a; }
 
-  /* Last-page chapter nav */
   .chapter-nav {
     display: flex; gap: 10px;
     margin-top: 16px; padding-top: 16px;
@@ -354,11 +314,7 @@
   .nav-chapter-btn.disabled { opacity: 0.35; pointer-events: none; }
   .nav-label { font-size: 0.68rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
   .nav-ch-title { font-size: 0.82rem; font-weight: 700; }
-  /* NOTE: user-select:none below does nothing against copy-unlocking
-     extensions (they override this trivially) — it's left only because
-     it costs nothing and blocks the rare manual right-click-copy user.
-     The real defenses are the ._jnk real-rect junk spans (see above) and
-     the DOM/visual order split on .scrambled paragraphs. */
+
   .chapter-body, .chapter-title, .chapter-wrap {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -366,7 +322,7 @@
     user-select: none;
     -webkit-touch-callout: none;
   }
-  /* Override SweetAlert2 to match RanobeVault theme */
+
   .swal2-popup.ranobe-alert {
     background: #1e1e2e !important;
     border: 1px solid #2e2e45 !important;
@@ -401,7 +357,6 @@
     color: #c8a96e !important;
   }
 
-  /* LOADING */
   .loading-screen {
     display: flex; flex-direction: column; align-items: center;
     justify-content: center; min-height: 60vh; gap: 16px;
@@ -414,11 +369,9 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text { font-size: 0.85rem; color: var(--text3); }
 
-  /* ERROR */
   .error-screen { text-align: center; padding: 60px 20px; color: var(--text3); }
   .error-screen h2 { color: var(--red); margin-bottom: 8px; font-family: 'Cinzel', serif; }
 
-  /* ADWALL OVERLAY */
   .adwall-overlay {
     position: fixed; inset: 0; z-index: 200;
     background: rgba(8,8,14,0.98); backdrop-filter: blur(12px);
@@ -451,7 +404,6 @@
   .adwall-note { margin-top: 12px; font-size: 0.75rem; color: var(--text3); }
   .adwall-back { margin-top: 20px; font-size: 0.8rem; color: var(--text3); cursor: pointer; }
   .adwall-back:hover { color: var(--accent); }
-  /* locked next btn styling */
   .nav-chapter-btn.locked-btn {
     border-color: rgba(200,169,110,0.3);
     background: rgba(200,169,110,0.05);
@@ -467,7 +419,6 @@
 </head>
 <body>
 
-<!-- ADWALL OVERLAY -->
 <div class="adwall-overlay" id="adwall">
   <div class="adwall-badge">FREE</div>
   <div class="adwall-icon">🔓</div>
@@ -494,7 +445,6 @@
 
 <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
 
-<!-- SETTINGS PANEL -->
 <div class="settings-panel" id="settings-panel">
   <div class="settings-row">
     <span class="settings-label">Font Size</span>
@@ -522,10 +472,8 @@ const params = new URLSearchParams(location.search);
 const hash = params.get('h');
 const unlockParam = params.get('unlock');
 
-// If the URL contains ?unlock=, the user just came back from the ad — save the key
 if (unlockParam) {
   localStorage.setItem(`rv_key_${unlockParam}`, '1');
-  // Clean the URL so the key isn't visible or shareable
   const cleanUrl = `${location.pathname}?h=${hash}`;
   history.replaceState(null, '', cleanUrl);
 }
@@ -536,8 +484,8 @@ let currentEntry = null;
 let fontSize = parseInt(localStorage.getItem('reader_fontsize') || '17');
 let isLight = localStorage.getItem('reader_light') === '1';
 
-var CHAPTER_ENDPOINT = 'https://ranobevault-chapters.non-admin.workers.dev/chapter'; // <-- set after deploying the chapter-gateway Cloudflare Worker
-var HASHMAP_ENDPOINT = CHAPTER_ENDPOINT.replace(/\/chapter$/, '/hashmap'); // auto-derived, no separate URL to set
+var CHAPTER_ENDPOINT = 'https://ranobevault-chapters.non-admin.workers.dev/chapter';
+var HASHMAP_ENDPOINT = CHAPTER_ENDPOINT.replace(/\/chapter$/, '/hashmap');
 
 async function fetchChapterFile(filename) {
   const res = await fetch(`${CHAPTER_ENDPOINT}?file=${encodeURIComponent(filename)}`);
@@ -553,7 +501,6 @@ async function fetchHashmap() {
 
 if (!hash) { location.href = 'index.html'; }
 
-// Apply saved settings immediately
 applyFontSize();
 applyMode();
 
@@ -573,19 +520,14 @@ async function init() {
       return;
     }
 
-
-
-    // Gate: if chapter is locked and key not in localStorage, show adwall
     if (currentEntry.locked && !isUnlocked(currentEntry)) {
       showAdwall(hash);
       updateBackLink();
       return;
     }
 
-    // Load chapter JSON
     chapterData = await fetchChapterFile(currentEntry.file);
 
-    // Preload next chapter
     if (currentEntry.next) {
       const nextEntry = hashmapData[currentEntry.next];
       if (nextEntry && !nextEntry.locked) {
@@ -596,6 +538,10 @@ async function init() {
     renderChapter();
     updateBackLink();
     saveProgress();
+    
+    // ── AGGRESSIVE IMAGE PRELOADING ────────────────────────────────────
+    // Load ALL images in chapter background after chapter renders
+    setTimeout(() => preloadAllImages(), 200);
 
   } catch(e) {
     showError('Failed to load chapter', e.message);
@@ -603,7 +549,6 @@ async function init() {
   }
 }
 
-// ── CSS Obfuscation helpers (module scope so renderPage can use them) ────────
 const JUNK_POOL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 function randJunk(len) {
   let s = '';
@@ -612,16 +557,7 @@ function randJunk(len) {
   return s;
 }
 
-// LAYER C — Watermark landmines.
-// The _jnk junk spans (below) are gibberish, so a scraper's cleanup pass
-// will likely target and strip anything that looks like garbage. These
-// watermark spans are plain, readable site-credit text instead — the kind
-// of string a cleanup script has no reason to flag — and each one gets a
-// randomly chosen inline style (never the _jnk class, never the same
-// style twice in a row), so a single ".remove('._jnk')" or similar rule
-// won't catch them. If they survive a strip pass, they surface in the
-// ripped file/EPUB wherever CSS gets dropped, crediting the site inline.
-const WATERMARK_RATE = 0.12; // ~1 in 8 paragraphs
+const WATERMARK_RATE = 0.12;
 const WATERMARKS = [
   'Read this officially at ranobevault.github.io',
   'Official source: RanobeVault — ranobevault.github.io',
@@ -630,65 +566,31 @@ const WATERMARKS = [
 ];
 function watermarkSpan() {
   const phrase = WATERMARKS[Math.floor(Math.random() * WATERMARKS.length)];
-  // Pulled out of flow entirely (position:absolute, no clip/zero-size) —
-  // takes zero space in the paragraph so it can't distort word spacing,
-  // and stays fully selectable/copyable since the box still renders,
-  // just off-canvas. display:none/0x0/clip(0,0,0,0) would be excluded
-  // from the Selection API outright, so a plain Ctrl+C would never even
-  // pick it up — that's the mistake the old CSS was making.
   return ` <span aria-hidden="true" style="position:absolute;left:-9999px;white-space:nowrap">${phrase}</span> `;
 }
 
-// ── Unicode poison pool ──────────────────────────────────────────────────────
-// LAYER A — Invisible zero-width / directional / formatting chars
-// These break tokenizers, search, copy-paste reconstruction.
 const ZW_POISON = [
   '\u200B','\u200C','\u200D','\u200E','\u200F',
   '\u2060','\u2061','\u2062','\u2063','\u2064',
   '\uFEFF','\u00AD','\u034F',
   '\u115F','\u1160','\u17B4','\u17B5',
-  '\u1D173','\u1D174','\u1D175','\u1D176', // musical invisible chars
-  '\u{E0020}','\u{E007F}',                  // tag block invisibles
 ];
 
-// LAYER B — Homoglyph map: swap common Latin letters for visually identical
-// chars from Cyrillic, Greek, or other Unicode blocks.
-// A cleanup script targeting invisible chars won't touch these at all —
-// they look correct on screen but encode differently, breaking:
-//   exact-match search, diff tools, AI tokenization, copy reconstruction.
 const HOMOGLYPHS = {
-  'a': '\u0430', // Cyrillic а
-  'e': '\u0435', // Cyrillic е
-  'o': '\u043E', // Cyrillic о
-  'p': '\u0440', // Cyrillic р
-  'c': '\u0441', // Cyrillic с
-  'x': '\u0445', // Cyrillic х
-  'A': '\u0410', // Cyrillic А
-  'E': '\u0415', // Cyrillic Е
-  'O': '\u041E', // Cyrillic О
-  'P': '\u0420', // Cyrillic Р
-  'C': '\u0421', // Cyrillic С
-  'B': '\u0412', // Cyrillic В
-  'H': '\u041D', // Cyrillic Н (looks like H)
-  'K': '\u041A', // Cyrillic К
-  'M': '\u041C', // Cyrillic М
-  'T': '\u0422', // Cyrillic Т
-  'i': '\u0456', // Ukrainian і (identical to i)
+  'a': '\u0430', 'e': '\u0435', 'o': '\u043E', 'p': '\u0440', 'c': '\u0441', 'x': '\u0445',
+  'A': '\u0410', 'E': '\u0415', 'O': '\u041E', 'P': '\u0420', 'C': '\u0421', 'B': '\u0412',
+  'H': '\u041D', 'K': '\u041A', 'M': '\u041C', 'T': '\u0422', 'i': '\u0456',
 };
-const HOMOGLYPH_CHARS = Object.keys(HOMOGLYPHS);
 
-// Applies homoglyph swaps to ~15-30% of eligible chars in a word.
-// Low rate keeps it subtle; random rate per word prevents patterns.
 function applyHomoglyphs(word) {
   if (word.length < 2) return word;
-  const rate = 0.15 + Math.random() * 0.15; // 15–30% of eligible chars
+  const rate = 0.15 + Math.random() * 0.15;
   return word.split('').map(ch => {
     if (HOMOGLYPHS[ch] && Math.random() < rate) return HOMOGLYPHS[ch];
     return ch;
   }).join('');
 }
 
-// Returns 1-3 random invisible poison chars, weighted toward 1.
 function poisonChars() {
   const roll = Math.random();
   const count = roll < 0.55 ? 1 : roll < 0.85 ? 2 : 3;
@@ -703,7 +605,6 @@ function poisonChars() {
   return result;
 }
 
-// Injects invisible chars at a random position within/around a word.
 function poisonWord(word) {
   if (!word) return word;
   const r = Math.random();
@@ -715,17 +616,11 @@ function poisonWord(word) {
     const split = 1 + Math.floor(Math.random() * Math.max(1, word.length - 1));
     return word.slice(0, split) + poisonChars() + word.slice(split);
   } else {
-    // Double injection: before + mid-split
     const split = 1 + Math.floor(Math.random() * Math.max(1, word.length - 1));
     return poisonChars() + word.slice(0, split) + poisonChars() + word.slice(split);
   }
 }
 
-// Shuffles word DOM order while preserving visual order via CSS `order`.
-// Selection/copy always walks the DOM, never computed flex order, so a
-// pasted paragraph comes out with its words scrambled even though it
-// reads perfectly normally on screen. Requires the parent <p> to have
-// class="scrambled" (display:flex; flex-wrap:wrap) — see CSS.
 function scrambleWords(items) {
   const indexed = items.map((html, i) => ({ html, order: i }));
   for (let i = indexed.length - 1; i > 0; i--) {
@@ -742,25 +637,17 @@ function obfuscatePara(text, scramble) {
   const words = esc.split(' ');
   const processedWords = words.map((word, i) => {
     if (!word) return '';
-    // Visible word is completely untouched — renders perfectly on screen.
-    // Junk lives in an off-flow span (position:absolute, no clip/zero-size
-    // — see ._jnk CSS) so it takes zero layout space and can't distort
-    // word spacing, but is still a real selectable text node.
     const ascii = randJunk(4 + Math.floor(Math.random() * 5));
     const poison = poisonChars();
     const glyphed = applyHomoglyphs(randJunk(3 + Math.floor(Math.random() * 4)));
     return `${word}<span aria-hidden="true" class="_jnk">${poison}${ascii}${glyphed}</span>`;
   });
 
-  // Splice in a watermark landmine at a random word boundary in ~1 of 8 paragraphs.
   if (processedWords.length > 3 && Math.random() < WATERMARK_RATE) {
     const idx = 1 + Math.floor(Math.random() * (processedWords.length - 1));
     processedWords.splice(idx, 0, watermarkSpan());
   }
 
-  // Word-order scrambling is skipped for the very first paragraph so the
-  // drop-cap (::first-letter) and any search-engine preview text still
-  // work normally; every paragraph after that gets scrambled.
   return scramble ? scrambleWords(processedWords) : processedWords.join(' ');
 }
 
@@ -773,12 +660,8 @@ function processContent(paragraphs) {
     if (para.startsWith('[img]')) {
       if (inCode) { html += `<pre>${codeBuffer.join('\n')}</pre>`; codeBuffer = []; inCode = false; }
       const url = para.slice(5).trim();
-      // ── IMPROVED IMAGE CLASSIFICATION ──────────────────────────────────
-      // Classify as full-page or inline based on context
-      const isFullPage = paragraphs.length < 5 || idx === 0 || idx === paragraphs.length - 1;
-      const className = isFullPage ? 'fullpage' : 'inline';
-      html += `<figure class="chapter-illustration ${className}"><img src="${url}" alt="Illustration" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>`;
-      // ──────────────────────────────────────────────────────────────────
+      // All illustrations: consistent 80vh fullpage
+      html += `<figure class="chapter-illustration"><img src="${url}" alt="Illustration" loading="lazy" onerror="this.parentElement.style.display='none'"></figure>`;
       return;
     }
     const isCode = para.startsWith('>') || para.startsWith('spell ') || para.startsWith('//') || para.startsWith('NAME:') || para.startsWith('SYSTEM');
@@ -797,17 +680,14 @@ function processContent(paragraphs) {
   return html;
 }
 
-// ── Pagination state ──────────────────────────────────────────────────────────
 let allPages = [];
 let currentPage = 0;
 
-// ── IMPROVED EPUB-LIKE PAGINATION ────────────────────────────────────────────
 function buildPages(paragraphs) {
   const fs = parseInt(localStorage.getItem('reader_fontsize') || '17');
   const lineH = fs * 1.85;
   const paraMargin = fs * 0.7;
 
-  // Calculate available space more accurately
   const topBar = 54;
   const pageHeader = 42;
   const pageFooter = 44;
@@ -816,35 +696,23 @@ function buildPages(paragraphs) {
   const contentWidth = Math.min(window.innerWidth - 44, 680);
   const availableHeight = window.innerHeight - topBar - pageHeader - pageFooter - padding;
   
-  // Character width calculation based on actual content width
   const charWidth = fs * 0.52;
   const charsPerLine = Math.floor(contentWidth / charWidth);
 
-  // Better paragraph height estimation
   function estimateParaHeight(text) {
-    // Images with responsive sizing
     if (text.startsWith('[img]')) {
-      const isMobile = window.innerWidth < 640;
-      const maxImgHeight = isMobile 
-        ? Math.min(availableHeight * 0.65, 400) 
-        : Math.min(availableHeight * 0.55, 500);
-      return maxImgHeight + (fs * 0.5);
+      return window.innerHeight * 0.8 + (fs * 0.5);
     }
-
-    // Code blocks
     if (text.startsWith('>') || text.startsWith('//') || 
         text.startsWith('NAME:') || text.startsWith('SYSTEM') || text.startsWith('spell ')) {
       const lines = text.split('\n').length;
       return (lines * lineH) + (fs * 0.5) + paraMargin;
     }
-
-    // Regular paragraphs
     if (!text.trim()) return fs * 0.5;
     const lines = Math.max(1, Math.ceil(text.length / charsPerLine));
     return (lines * lineH) + paraMargin;
   }
 
-  // Build pages with orphan/widow prevention
   const pages = [];
   let currentPageBuffer = [];
   let currentPageHeight = 0;
@@ -860,7 +728,6 @@ function buildPages(paragraphs) {
     const hasContentOnPage = contentParas.length > 0;
 
     if (totalWithNewPara > availableHeight && hasContentOnPage) {
-      // Avoid widow: keep short content with previous if it fits
       if (isShortContent && currentPageHeight + paraHeight < availableHeight * 1.15) {
         currentPageBuffer.push(para);
         currentPageHeight += paraHeight;
@@ -878,20 +745,14 @@ function buildPages(paragraphs) {
   if (currentPageBuffer.length > 0) pages.push(currentPageBuffer);
   return pages.length > 0 ? pages : [paragraphs];
 }
-// ────────────────────────────────────────────────────────────────────────────
 
-// ── Page preload cache ────────────────────────────────────────────────────────
-// Pre-renders adjacent pages into a Map so renderPage can swap instantly.
-// Images in preloaded pages are also fetched by the browser cache automatically.
 const pageCache = new Map();
 
 function preloadPage(pageIndex) {
   if (pageIndex < 0 || pageIndex >= allPages.length) return;
-  if (pageCache.has(pageIndex)) return; // already cached
-  // Build HTML off-screen — processContent is pure, no DOM side effects
+  if (pageCache.has(pageIndex)) return;
   const html = processContent(allPages[pageIndex]);
   pageCache.set(pageIndex, html);
-  // Trigger image preload for any [img] paragraphs on this page
   allPages[pageIndex].forEach(para => {
     if (para.startsWith('[img]')) {
       const url = para.slice(5).trim();
@@ -902,10 +763,23 @@ function preloadPage(pageIndex) {
 }
 
 function preloadAdjacent(pageIndex) {
-  // Preload next 2 and prev 1 pages
   preloadPage(pageIndex + 1);
   preloadPage(pageIndex + 2);
+  preloadPage(pageIndex + 3);
   preloadPage(pageIndex - 1);
+}
+
+// ── AGGRESSIVE IMAGE PRELOADING ────────────────────────────────────────
+// Preload all images in chapter upfront so they're ready before user sees them
+function preloadAllImages() {
+  if (!chapterData || !chapterData.content) return;
+  chapterData.content.forEach(para => {
+    if (para.startsWith('[img]')) {
+      const url = para.slice(5).trim();
+      const img = new Image();
+      img.src = url; // Browser caches automatically
+    }
+  });
 }
 
 function renderPage(pageIndex) {
@@ -918,14 +792,11 @@ function renderPage(pageIndex) {
   const isLastPage = pageIndex === allPages.length - 1;
   const isFirstPage = pageIndex === 0;
 
-  // Update progress bar
   const bar = document.getElementById('progress');
   if (bar) bar.style.width = allPages.length <= 1 ? '100%' : ((pageIndex / (allPages.length - 1)) * 100) + '%';
 
-  // Save page position
   localStorage.setItem(`pos_${hash}`, pageIndex);
 
-  // Build page body — use preloaded cache if available
   let bodyHtml = '';
   if (isFirstPage) {
     bodyHtml += `
@@ -937,9 +808,8 @@ function renderPage(pageIndex) {
   }
   const cachedBody = pageCache.get(pageIndex);
   bodyHtml += `<div class="chapter-body">${cachedBody || processContent(pageData)}</div>`;
-  if (!cachedBody) pageCache.set(pageIndex, processContent(pageData)); // cache for next visit
+  if (!cachedBody) pageCache.set(pageIndex, processContent(pageData));
 
-  // Last page: show chapter nav inside the scrollable page view
   if (isLastPage) {
     bodyHtml += `
       <div class="chapter-nav">
@@ -970,7 +840,6 @@ function renderPage(pageIndex) {
   }
 
   const wrap = document.querySelector('.chapter-wrap');
-  // Build pip dots — cap at 20, show condensed "..." beyond that
   const MAX_PIPS = 20;
   const total = allPages.length;
   let pipsHtml = '';
@@ -979,7 +848,6 @@ function renderPage(pageIndex) {
       `<span class="pip${i === pageIndex ? ' pip-active' : ''}"></span>`
     ).join('');
   } else {
-    // Show: first, ..., current-1, current, current+1, ..., last
     for (let i = 0; i < total; i++) {
       const near = Math.abs(i - pageIndex) <= 1 || i === 0 || i === total - 1;
       const edgeDot = (i === 1 && pageIndex > 2) || (i === total - 2 && pageIndex < total - 3);
@@ -1000,7 +868,6 @@ function renderPage(pageIndex) {
       <div class="page-counter">Page <strong>${pageIndex + 1}</strong> / ${allPages.length}</div>
     </div>`;
 
-  // ── IMPROVED TOUCH DETECTION WITH DURATION CHECK ────────────────────────
   const pv = wrap.querySelector('.page-view');
   if (pv) {
     let tapStartX = 0, tapStartY = 0, tapStartScroll = 0, tapStartTime = 0;
@@ -1016,7 +883,6 @@ function renderPage(pageIndex) {
       const scrolled = Math.abs(pv.scrollTop - tapStartScroll);
       const duration = Date.now() - tapStartTime;
       
-      // True tap: minimal movement, quick release, no scroll, short duration
       if (dx < 12 && dy < 12 && scrolled < 8 && duration < 250) {
         const xPct = tapStartX / window.innerWidth;
         if (xPct < 0.30 && currentPage > 0) renderPage(currentPage - 1);
@@ -1024,7 +890,6 @@ function renderPage(pageIndex) {
       }
     }, { passive: true });
   }
-  // ────────────────────────────────────────────────────────────────────────
 
   if (isFirstPage) {
     fetch('data/series.json').then(r=>r.json()).then(series => {
@@ -1034,41 +899,33 @@ function renderPage(pageIndex) {
     }).catch(()=>{});
   }
 
-  // Preload adjacent pages in background after current page is rendered
   setTimeout(() => preloadAdjacent(pageIndex), 100);
-
   applyFontSize();
 }
 
 function renderChapter() {
   const d = chapterData;
   const entry = currentEntry;
-  const prevEntry = entry.prev ? hashmapData[entry.prev] : null;
   document.title = `${d.title} — RanobeVault`;
   document.getElementById('top-title').textContent = d.title;
 
-  // Build pages and create shell
   allPages = buildPages(d.content || []);
   document.getElementById('content').innerHTML = `<div class="chapter-wrap"></div>`;
 
   setupProgress();
 
-  // Restore saved page or start at 0
   const savedPage = parseInt(localStorage.getItem(`pos_${hash}`) || '0');
   renderPage((savedPage > 0 && savedPage < allPages.length) ? savedPage : 0);
 }
 
 function showAdwall(targetHash) {
-  // If targetHash passed, we're unlocking the NEXT chapter from the nav button
   const unlockHash = targetHash || hash;
   const entry = targetHash ? hashmapData[targetHash] : currentEntry;
 
-  // Already unlocked? Navigate directly
   if (isUnlocked(entry)) {
     window.location.href = `chapter.html?h=${unlockHash}`;
     return;
   }
-
 
   const overlay = document.getElementById('adwall');
   const link = document.getElementById('adwall-link');
@@ -1079,7 +936,6 @@ function showAdwall(targetHash) {
     link.style.pointerEvents = 'all';
   } else {
     link.href = '#';
-    link.querySelector ? (link.querySelector('.adwall-btn-icon') || link).textContent : null;
     link.style.opacity = '0.5';
     link.style.pointerEvents = 'none';
   }
@@ -1092,78 +948,9 @@ function handleAdwallClick(e) {
   if (!link.href || link.href === '#' || link.href === window.location.href) {
     e.preventDefault(); return;
   }
-
-  // Just navigate — unlock key is embedded in the Linkvertise destination URL (?unlock=...).
-  // When user completes the ad and lands back on chapter.html, the key is read and saved automatically.
-}
-
-function showBookmarkAlert() {
-  const SUPPRESS_KEY = 'rv_bookmark_suppress';
-  const SUPPRESS_HOURS = 12;
-
-  // Check if user clicked "Don't show again" within the last 12 hours
-  const suppressed = localStorage.getItem(SUPPRESS_KEY);
-  if (suppressed && Date.now() - parseInt(suppressed) < SUPPRESS_HOURS * 60 * 60 * 1000) return;
-
-  setTimeout(() => {
-    Swal.fire({
-      background: '#1e1e2e',
-      color: '#e8e6f0',
-      icon: 'success',
-      iconColor: '#5ce0a0',
-      title: '<span style="font-family:Cinzel,serif;color:#c8a96e;font-size:1.2rem">📌 Save This Page!</span>',
-      html: `
-        <div style="font-size:0.88rem;color:#a09dbb;line-height:1.8;margin-top:4px">
-          Bookmark or save this page so you can come back anytime without going through the link again.
-          <br><br>
-          <span style="font-size:0.8rem;color:#6b6884">
-            📱 <strong style="color:#c8a96e">Mobile:</strong> Share → Add to Home Screen<br>
-            💻 <strong style="color:#c8a96e">Desktop:</strong> Ctrl+D &nbsp;/&nbsp; Cmd+D (Mac)
-          </span>
-          <br><br>
-          <label style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-size:0.78rem;color:#6b6884">
-            <input type="checkbox" id="swal-dont-show" style="accent-color:#c8a96e;width:14px;height:14px;cursor:pointer">
-            Don't show this again for 12 hours
-          </label>
-        </div>`,
-      confirmButtonText: '📖 Got it, Start Reading!',
-      confirmButtonColor: '#c8a96e',
-      showCancelButton: false,
-      preConfirm: () => {
-        if (document.getElementById('swal-dont-show')?.checked) {
-          localStorage.setItem(SUPPRESS_KEY, Date.now().toString());
-        }
-      }
-    });
-  }, 800);
-}
-
-async function loadAndRenderChapter() {
-  try {
-    chapterData = await fetchChapterFile(currentEntry.file);
-    renderChapter();
-    updateBackLink();
-    saveProgress();
-  } catch(e) {
-    showError('Failed to load chapter', e.message);
-  }
-}
-
-function updateBackLink() {
-  if (currentEntry) {
-    document.getElementById('back-link').href = `series.html?id=${currentEntry.series}`;
-  }
-}
-
-function saveProgress() {
-  if (!currentEntry || !chapterData) return;
-  const data = { hash, title: chapterData.title, volume: currentEntry.volume, chapter: currentEntry.chapter };
-  localStorage.setItem(`continue_${currentEntry.series}`, JSON.stringify(data));
-  localStorage.setItem(`read_${hash}`, '1');
 }
 
 function setupProgress() {
-  // Keyboard arrow navigation only — no scroll auto-advance
   document.addEventListener('keydown', function(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
@@ -1174,7 +961,6 @@ function setupProgress() {
   });
 }
 
-// Settings
 document.getElementById('settings-btn').onclick = () => {
   document.getElementById('settings-panel').classList.toggle('open');
 };
@@ -1221,7 +1007,19 @@ function showError(title, msg) {
 
 function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// ── AUTO-REPAGINATE ON WINDOW RESIZE ──────────────────────────────────────
+function updateBackLink() {
+  if (currentEntry) {
+    document.getElementById('back-link').href = `series.html?id=${currentEntry.series}`;
+  }
+}
+
+function saveProgress() {
+  if (!currentEntry || !chapterData) return;
+  const data = { hash, title: chapterData.title, volume: currentEntry.volume, chapter: currentEntry.chapter };
+  localStorage.setItem(`continue_${currentEntry.series}`, JSON.stringify(data));
+  localStorage.setItem(`read_${hash}`, '1');
+}
+
 let resizeTimeout;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimeout);
@@ -1230,33 +1028,20 @@ window.addEventListener('resize', () => {
       const oldPage = currentPage;
       pageCache.clear();
       allPages = buildPages(chapterData.content || []);
-      // Restore to approximately the same position
       const newPage = Math.min(oldPage, allPages.length - 1);
       renderPage(newPage);
     }
-  }, 300); // debounce to avoid excessive recalculation
+  }, 300);
 }, { passive: true });
-// ────────────────────────────────────────────────────────────────────────────
 
 init();
-// Show bookmark alert if user just completed an ad unlock
-// Only show bookmark alert when user just completed an ad unlock
-if (unlockParam) {
-  showBookmarkAlert();
-}
 
-/* ============================================================
-   ANTI-COPY SYSTEM — RanobeVault
-   Covers: text selection (desktop mouseup), long-press (mobile),
-   right-click, Ctrl/Cmd + C/A/U/S/P/X, F12, devtools shortcuts
-   ============================================================ */
 (function() {
   let alertShowing = false;
   let longPressTimer = null;
   const LONG_PRESS_MS = 500;
 
   function fireAlert(reason) {
-    // Immediately nuke any selection
     if (window.getSelection) window.getSelection().removeAllRanges();
     if (document.selection) document.selection.empty();
 
@@ -1288,11 +1073,9 @@ if (unlockParam) {
     });
   }
 
-  // ── 1. Text selection on desktop (mouseup) ──────────────────
   document.addEventListener('mouseup', function(e) {
     const sel = window.getSelection();
     if (sel && sel.toString().trim().length > 0) {
-      // Only block if selection is inside chapter content
       const anchor = sel.anchorNode;
       if (anchor && document.querySelector('.chapter-body') &&
           document.querySelector('.chapter-body').contains(anchor)) {
@@ -1302,7 +1085,6 @@ if (unlockParam) {
     }
   }, true);
 
-  // Also clear selection on mousedown inside chapter body
   document.addEventListener('mousedown', function(e) {
     if (e.target.closest('.chapter-body') || e.target.closest('.chapter-wrap')) {
       setTimeout(() => {
@@ -1311,7 +1093,6 @@ if (unlockParam) {
     }
   }, true);
 
-  // ── 2. Long-press on mobile (touchend) ──────────────────────
   document.addEventListener('touchstart', function(e) {
     if (e.target.closest('.chapter-body') || e.target.closest('.chapter-wrap')) {
       longPressTimer = setTimeout(function() {
@@ -1333,7 +1114,6 @@ if (unlockParam) {
     clearTimeout(longPressTimer);
   }, { passive: true });
 
-  // ── 3. Right-click context menu ─────────────────────────────
   document.addEventListener('contextmenu', function(e) {
     if (e.target.closest('.chapter-body') || e.target.closest('.chapter-wrap') ||
         e.target.closest('.chapter-header')) {
@@ -1344,21 +1124,17 @@ if (unlockParam) {
     }
   }, true);
 
-  // ── 4. Keyboard shortcuts ────────────────────────────────────
   const BLOCKED_KEYS = new Set(['c', 'a', 'u', 's', 'p', 'x']);
   document.addEventListener('keydown', function(e) {
     const ctrl = e.ctrlKey || e.metaKey;
 
-    // Block Ctrl/Cmd + C/A/U/S/P/X
     if (ctrl && BLOCKED_KEYS.has(e.key.toLowerCase())) {
       e.preventDefault();
       e.stopImmediatePropagation();
-      const labels = { c:'Copy', a:'Select All', u:'View Source', s:'Save', p:'Print', x:'Cut' };
       fireAlert(`Keyboard shortcut (${e.key.toUpperCase()}) is disabled.`);
       return false;
     }
 
-    // Block F12
     if (e.key === 'F12') {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -1366,7 +1142,6 @@ if (unlockParam) {
       return false;
     }
 
-    // Block Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C (devtools)
     if (ctrl && e.shiftKey && ['i','j','c','k'].includes(e.key.toLowerCase())) {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -1374,7 +1149,6 @@ if (unlockParam) {
       return false;
     }
 
-    // Block Ctrl+Shift+U (Linux view source)
     if (ctrl && e.shiftKey && e.key.toLowerCase() === 'u') {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -1383,11 +1157,6 @@ if (unlockParam) {
     }
   }, true);
 
-  // ── 5. Copy / Cut events ─────────────────────────────────────
-  // Instead of just blocking, we replace the clipboard with a
-  // protected message — so anyone who pastes gets this instead
-  // of the real chapter text. Works in browser, EPUB editors,
-  // Notepad, Discord, anywhere they paste.
   const PROTECTED_MESSAGE =
 `--------------------------------------------------
 This chapter is protected.
@@ -1400,7 +1169,6 @@ Thank you for supporting the website.
   document.addEventListener('copy', function(e) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    // Write the protection message into the clipboard
     if (e.clipboardData) {
       e.clipboardData.setData('text/plain', PROTECTED_MESSAGE);
       e.clipboardData.setData('text/html',
@@ -1423,7 +1191,6 @@ Thank you for supporting the website.
     return false;
   }, true);
 
-  // ── 6. Drag selection ────────────────────────────────────────
   document.addEventListener('dragstart', function(e) {
     if (e.target.closest('.chapter-body')) {
       e.preventDefault();
@@ -1431,7 +1198,6 @@ Thank you for supporting the website.
     }
   }, true);
 
-  // ── 7. selectstart — prevent selection initiation ────────────
   document.addEventListener('selectstart', function(e) {
     if (e.target.closest('.chapter-body') || e.target.closest('.chapter-header')) {
       e.preventDefault();
@@ -1439,13 +1205,9 @@ Thank you for supporting the website.
     }
   }, true);
 
-  // ── 8. Devtools detection (size change heuristic) ────────────
-  // NOTE: This uses window size difference as a heuristic. It can false-positive
-  // on browsers with large toolbars, sidebars, or zoomed-out displays.
-  // We use a generous threshold + a confirmation delay to avoid bothering readers.
   let devtoolsOpen = false;
-  const threshold = 300; // raised to reduce false positives from browser UI chrome
-  let devtoolsConfirmCount = 0; // require consistent detection before alerting
+  const threshold = 300;
+  let devtoolsConfirmCount = 0;
 
   setInterval(function() {
     const widthDiff  = window.outerWidth  - window.innerWidth;
@@ -1454,14 +1216,12 @@ Thank you for supporting the website.
 
     if (likelyOpen && !devtoolsOpen) {
       devtoolsConfirmCount++;
-      // Only trigger after 3 consecutive checks (~3s) to avoid brief resize false-fires
       if (devtoolsConfirmCount >= 3) {
         devtoolsOpen = true;
         devtoolsConfirmCount = 0;
         const body = document.querySelector('.chapter-body');
         if (body) body.style.filter = 'blur(6px)';
 
-        // Show a friendly, non-accusatory notice
         if (alertShowing) return;
         alertShowing = true;
         Swal.fire({
@@ -1479,7 +1239,7 @@ Thank you for supporting the website.
               Simply close any side panels or go fullscreen and the content will restore.
             </span>`,
           icon: 'warning',
-          confirmButtonText: '✓ Got it, close panels',
+          confirmButtonText: '✓ Got it',
           showClass: { popup: 'animate__animated animate__fadeInDown animate__faster' },
           hideClass: { popup: 'animate__animated animate__fadeOutUp animate__faster' },
           allowOutsideClick: true,
@@ -1501,486 +1261,5 @@ Thank you for supporting the website.
 
 })();
 </script>
-<!-- ============ CONTACT WIDGET ============ -->
-<style>
-  :root{ --cw-endpoint: ""; }
-
-  .cw-fab {
-    position: fixed; bottom: 22px; right: 22px; z-index: 9998;
-    display: flex; align-items: center; gap: 8px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #1a1410; border: none; border-radius: 999px;
-    padding: 12px 18px 12px 14px; cursor: pointer;
-    font-family: 'Lato', sans-serif; font-size: 0.85rem; font-weight: 700;
-    box-shadow: 0 6px 20px rgba(0,0,0,.35), 0 0 0 rgba(200,169,110,.5);
-    transition: transform .25s ease, box-shadow .25s ease;
-    animation: cw-pop .5s ease .3s both, cw-pulse 2.6s ease-in-out 1.2s 2;
-  }
-  .cw-fab:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 26px rgba(0,0,0,.4); }
-  .cw-fab:active { transform: translateY(-1px) scale(.98); }
-  .cw-fab-icon { font-size: 1.05rem; line-height: 1; }
-  .cw-fab-text { white-space: nowrap; }
-  .cw-fab.cw-hidden { display: none; }
-
-  @keyframes cw-pop { from { transform: scale(0) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
-  @keyframes cw-pulse {
-    0%, 100% { box-shadow: 0 6px 20px rgba(0,0,0,.35), 0 0 0 0 rgba(200,169,110,.45); }
-    50% { box-shadow: 0 6px 20px rgba(0,0,0,.35), 0 0 0 8px rgba(200,169,110,0); }
-  }
-
-  .cw-overlay {
-    position: fixed; inset: 0; z-index: 9999;
-    background: rgba(8,8,12,.55); backdrop-filter: blur(2px);
-    display: flex; align-items: flex-end; justify-content: flex-end;
-    padding: 22px; opacity: 0; pointer-events: none;
-    transition: opacity .22s ease;
-  }
-  .cw-overlay.cw-open { opacity: 1; pointer-events: all; }
-
-  .cw-panel {
-    width: 100%; max-width: 360px;
-    background: var(--surface, #1e1e2e); border: 1px solid var(--border, #2e2e45);
-    border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.5);
-    display: flex; flex-direction: column; overflow: hidden;
-    transform: translateY(24px) scale(.97); opacity: 0;
-    transition: transform .28s cubic-bezier(.2,.9,.3,1.2), opacity .22s ease;
-    max-height: min(560px, 80vh);
-    font-family: 'Lato', sans-serif;
-  }
-  .cw-overlay.cw-open .cw-panel { transform: translateY(0) scale(1); opacity: 1; }
-
-  .cw-head {
-    padding: 16px 18px; display: flex; align-items: center; gap: 10px;
-    background: var(--bg3, #1a1a28); border-bottom: 1px solid var(--border, #2e2e45);
-  }
-  .cw-head-icon {
-    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    display: flex; align-items: center; justify-content: center; font-size: 1rem;
-  }
-  .cw-head-txt { flex: 1; min-width: 0; }
-  .cw-head-title {
-    font-family: 'Cinzel', serif; font-size: .95rem; color: var(--accent);
-    font-weight: 700; letter-spacing: .02em;
-  }
-  .cw-head-sub { font-size: .72rem; color: var(--text3, #6b6884); margin-top: 2px; }
-  .cw-close {
-    background: none; border: none; color: var(--text3, #6b6884); cursor: pointer;
-    font-size: 1.1rem; line-height: 1; padding: 6px; border-radius: 6px; transition: color .15s, background .15s;
-  }
-  .cw-close:hover { color: var(--text, #e8e6f0); background: rgba(255,255,255,.06); }
-
-  .cw-body { padding: 16px 18px 18px; overflow-y: auto; }
-
-  .cw-field { margin-bottom: 14px; }
-  .cw-label {
-    display: block; font-size: .72rem; color: var(--text2, #a09dbb);
-    letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; font-weight: 700;
-  }
-  .cw-input, .cw-select, .cw-textarea {
-    width: 100%; background: var(--bg3, #1a1a28); border: 1px solid var(--border, #2e2e45);
-    color: var(--text, #e8e6f0); border-radius: 9px; padding: 10px 12px;
-    font-family: 'Lato', sans-serif; font-size: .86rem; outline: none;
-    transition: border-color .15s;
-  }
-  .cw-input:focus, .cw-select:focus, .cw-textarea:focus { border-color: var(--accent); }
-  .cw-select { appearance: none; cursor: pointer;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%239a97b8'/></svg>");
-    background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px;
-  }
-  .cw-select option { background: var(--bg3, #1a1a28); }
-  .cw-textarea { resize: vertical; min-height: 92px; line-height: 1.5; }
-
-  .cw-context {
-    font-size: .72rem; color: var(--text3, #6b6884); margin-top: -6px; margin-bottom: 14px;
-    padding: 7px 10px; background: var(--bg3, #1a1a28); border-radius: 7px;
-    border: 1px dashed var(--border, #2e2e45); display: none; gap: 6px; align-items: center;
-  }
-  .cw-context.cw-show { display: flex; }
-  .cw-context b { color: var(--accent); font-weight: 700; }
-
-  .cw-count { text-align: right; font-size: .68rem; color: var(--text3, #6b6884); margin-top: 4px; }
-  .cw-count.cw-warn { color: var(--red, #e05c6a); }
-
-  .cw-hp { position: absolute; left: -9999px; opacity: 0; pointer-events: none; }
-
-  .cw-submit {
-    width: 100%; padding: 11px; border: none; border-radius: 9px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #1a1410; font-weight: 700; font-size: .88rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: filter .15s, transform .1s;
-  }
-  .cw-submit:hover { filter: brightness(1.08); }
-  .cw-submit:active { transform: scale(.98); }
-  .cw-submit:disabled { opacity: .6; cursor: not-allowed; }
-
-  .cw-spin {
-    width: 14px; height: 14px; border-radius: 50%;
-    border: 2px solid rgba(26,20,16,.35); border-top-color: #1a1410;
-    animation: cw-spin .7s linear infinite; display: none;
-  }
-  .cw-submit.cw-loading .cw-spin { display: inline-block; }
-  .cw-submit.cw-loading .cw-submit-txt { opacity: .7; }
-  @keyframes cw-spin { to { transform: rotate(360deg); } }
-
-  .cw-error {
-    display: none; font-size: .76rem; color: var(--red, #e05c6a);
-    background: rgba(224,92,106,.1); border: 1px solid rgba(224,92,106,.3);
-    border-radius: 8px; padding: 8px 10px; margin-top: 10px;
-  }
-  .cw-error.cw-show { display: block; }
-
-  .cw-success {
-    display: none; flex-direction: column; align-items: center; text-align: center;
-    padding: 30px 18px 34px; gap: 10px;
-  }
-  .cw-success.cw-show { display: flex; }
-  .cw-success-check {
-    width: 52px; height: 52px; border-radius: 50%;
-    background: rgba(92,224,160,.12); border: 1px solid rgba(92,224,160,.4);
-    display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
-    color: var(--green, #5ce0a0); animation: cw-pop .35s ease;
-  }
-  .cw-success-title { font-family: 'Cinzel', serif; color: var(--text, #e8e6f0); font-size: .95rem; font-weight: 700; }
-  .cw-success-sub { font-size: .78rem; color: var(--text3, #6b6884); max-width: 290px; line-height: 1.45; }
-
-  .cw-ticket-box {
-    margin-top: 10px; background: var(--bg3, #1a1a28); border: 1px dashed var(--border, #2e2e45);
-    border-radius: 8px; padding: 10px 12px; width: 100%; text-align: left;
-  }
-  .cw-ticket-label { font-size: .68rem; color: var(--text3, #6b6884); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
-  .cw-ticket-row { display: flex; align-items: center; gap: 8px; }
-  .cw-ticket-id { font-family: monospace; font-size: .82rem; color: var(--accent); flex: 1; overflow-wrap: anywhere; }
-  .cw-ticket-copy {
-    background: var(--surface, #1e1e2e); border: 1px solid var(--border, #2e2e45); color: var(--text2, #a09dbb);
-    border-radius: 6px; padding: 4px 10px; font-size: .72rem; cursor: pointer; transition: all .15s; flex-shrink: 0;
-  }
-  .cw-ticket-copy:hover { border-color: var(--accent); color: var(--accent); }
-  .cw-ticket-hint { font-size: .7rem; color: var(--text3, #6b6884); margin-top: 6px; line-height: 1.4; }
-
-  .cw-status-toggle { text-align: center; font-size: .74rem; color: var(--text3, #6b6884); margin-top: 12px; cursor: pointer; }
-  .cw-status-toggle:hover { color: var(--accent); }
-
-  .cw-status-view { display: none; }
-  .cw-status-view.cw-show { display: block; }
-  .cw-status-back { font-size: .74rem; color: var(--text3, #6b6884); cursor: pointer; margin-top: 14px; text-align: center; }
-  .cw-status-back:hover { color: var(--accent); }
-  .cw-status-result { margin-top: 14px; }
-  .cw-status-pill-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .cw-status-badge { font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: capitalize; }
-  .cw-status-badge.unread { background: rgba(200,169,110,.14); color: var(--accent); }
-  .cw-status-badge.read { background: rgba(106,180,224,.14); color: #6ab4e0; }
-  .cw-status-badge.resolved { background: rgba(92,224,160,.14); color: var(--green, #5ce0a0); }
-  .cw-status-meta { font-size: .78rem; color: var(--text2, #a09dbb); line-height: 1.5; }
-  .cw-status-error { font-size: .78rem; color: var(--red, #e05c6a); margin-top: 8px; }
-
-  .cw-form.cw-hide { display: none; }
-
-  @media (max-width: 480px) {
-    .cw-overlay { padding: 0; align-items: flex-end; }
-    .cw-panel { max-width: 100%; border-radius: 16px 16px 0 0; max-height: 85vh; }
-    .cw-fab-text { display: none; }
-    .cw-fab { padding: 13px; }
-  }
-</style>
-
-<button class="cw-fab" id="cwFab" aria-label="Contact / Support">
-  <span class="cw-fab-icon">💬</span>
-  <span class="cw-fab-text">Message Me</span>
-</button>
-
-<div class="cw-overlay" id="cwOverlay">
-  <div class="cw-panel" role="dialog" aria-modal="true" aria-labelledby="cwTitle">
-    <div class="cw-head">
-      <div class="cw-head-icon">✉️</div>
-      <div class="cw-head-txt">
-        <div class="cw-head-title" id="cwTitle">Get in Touch</div>
-        <div class="cw-head-sub">Requests, fixes, feedback — all read personally</div>
-      </div>
-      <button class="cw-close" id="cwClose" aria-label="Close">✕</button>
-    </div>
-    <div class="cw-body">
-      <form class="cw-form" id="cwForm">
-        <div class="cw-field">
-          <label class="cw-label" for="cwUsername">Your Name / Username</label>
-          <input class="cw-input" id="cwUsername" maxlength="50" placeholder="e.g. NovelFan92" autocomplete="off" required>
-        </div>
-        <div class="cw-field">
-          <label class="cw-label" for="cwReason">Reason</label>
-          <select class="cw-select" id="cwReason">
-            <option value="fix_chapter">🛠️ Fix a Chapter</option>
-            <option value="request_translation">🌐 Request a Translation</option>
-            <option value="report_bug">🐞 Report a Bug</option>
-            <option value="suggest_series">📚 Suggest a Series</option>
-            <option value="feedback">💛 General Feedback</option>
-            <option value="other">✨ Other</option>
-          </select>
-        </div>
-        <div class="cw-context" id="cwContext">
-          📍 <span>Regarding: <b id="cwContextText"></b></span>
-        </div>
-        <div class="cw-field">
-          <label class="cw-label" for="cwDetails">Details</label>
-          <textarea class="cw-textarea" id="cwDetails" maxlength="1000" placeholder="Tell me what's up — the more specific, the faster I can help." required></textarea>
-          <div class="cw-count" id="cwCount">0 / 1000</div>
-        </div>
-        <input class="cw-hp" id="cwHp" type="text" tabindex="-1" autocomplete="off">
-        <button type="submit" class="cw-submit" id="cwSubmit">
-          <span class="cw-spin"></span>
-          <span class="cw-submit-txt">Send Message</span>
-        </button>
-        <div class="cw-error" id="cwError"></div>
-        <div class="cw-status-toggle" id="cwStatusToggle">Already sent a message? Check its status &rarr;</div>
-      </form>
-      <div class="cw-success" id="cwSuccess">
-        <div class="cw-success-check">✓</div>
-        <div class="cw-success-title">Message sent!</div>
-        <div class="cw-success-sub" id="cwSuccessSub">Thanks for reaching out — I read every message and usually reply within a few days.</div>
-        <div class="cw-ticket-box">
-          <div class="cw-ticket-label">Your Ticket ID</div>
-          <div class="cw-ticket-row">
-            <span class="cw-ticket-id" id="cwTicketId"></span>
-            <button type="button" class="cw-ticket-copy" id="cwTicketCopy">Copy</button>
-          </div>
-          <div class="cw-ticket-hint">Save this — you can check your status anytime with it.</div>
-        </div>
-      </div>
-      <div class="cw-status-view" id="cwStatusView">
-        <div class="cw-field">
-          <label class="cw-label" for="cwTicketInput">Ticket ID</label>
-          <input class="cw-input" id="cwTicketInput" placeholder="e.g. msg_x7k2p9a1" autocomplete="off">
-        </div>
-        <button type="button" class="cw-submit" id="cwCheckBtn">
-          <span class="cw-spin" id="cwCheckSpin"></span>
-          <span>Check Status</span>
-        </button>
-        <div class="cw-status-result" id="cwStatusResult"></div>
-        <div class="cw-status-back" id="cwStatusBack">&larr; Back to message form</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-(function(){
-  var CW_ENDPOINT = 'https://ranobevault-contact.non-admin.workers.dev/message'; // <-- set after deploying the Cloudflare Worker
-
-  var fab = document.getElementById('cwFab');
-  var overlay = document.getElementById('cwOverlay');
-  var closeBtn = document.getElementById('cwClose');
-  var form = document.getElementById('cwForm');
-  var success = document.getElementById('cwSuccess');
-  var submitBtn = document.getElementById('cwSubmit');
-  var errorBox = document.getElementById('cwError');
-  var reasonSel = document.getElementById('cwReason');
-  var contextBox = document.getElementById('cwContext');
-  var contextText = document.getElementById('cwContextText');
-  var details = document.getElementById('cwDetails');
-  var count = document.getElementById('cwCount');
-  var usernameInput = document.getElementById('cwUsername');
-  var successSub = document.getElementById('cwSuccessSub');
-  var statusToggle = document.getElementById('cwStatusToggle');
-  var statusView = document.getElementById('cwStatusView');
-  var statusBack = document.getElementById('cwStatusBack');
-  var ticketInput = document.getElementById('cwTicketInput');
-  var checkBtn = document.getElementById('cwCheckBtn');
-  var checkSpin = document.getElementById('cwCheckSpin');
-  var statusResult = document.getElementById('cwStatusResult');
-  var ticketIdEl = document.getElementById('cwTicketId');
-  var ticketCopyBtn = document.getElementById('cwTicketCopy');
-
-  var REASON_LABELS = {
-    fix_chapter: 'Fix a Chapter', request_translation: 'Request a Translation',
-    report_bug: 'Report a Bug', suggest_series: 'Suggest a Series',
-    feedback: 'General Feedback', other: 'Other'
-  };
-  var STATUS_LABELS = {
-    unread: "Received — hasn't been looked at yet.",
-    read: "Seen — it's on the list.",
-    resolved: "Resolved!"
-  };
-
-  var REASON_SUCCESS = {
-    fix_chapter: "Thanks for flagging it — I'll take a look and aim to have it fixed within 24 hours.",
-    report_bug: "Thanks for the report — I'll take a look and aim to have it fixed within 24 hours.",
-    request_translation: "Noted! It's now on the list of series being considered for translation — no fixed timeline, but I'll keep it in mind.",
-    suggest_series: "Noted! It's now on the list of series being considered for translation — no fixed timeline, but I'll keep it in mind.",
-    feedback: "Thanks for the feedback — I read every message.",
-    other: "Thanks for reaching out — I read every message."
-  };
-
-  // Remember username across visits
-  try {
-    var savedName = localStorage.getItem('cw_username');
-    if (savedName) usernameInput.value = savedName;
-  } catch(e){}
-
-  function pageContext(){
-    var title = document.title.replace(/\s*[-—|]\s*RanobeVault.*$/i, '').trim();
-    return { title: title || document.title, url: window.location.href };
-  }
-
-  function updateContext(){
-    var reason = reasonSel.value;
-    if (reason === 'fix_chapter' || reason === 'request_translation') {
-      var ctx = pageContext();
-      contextText.textContent = ctx.title;
-      contextBox.classList.add('cw-show');
-    } else {
-      contextBox.classList.remove('cw-show');
-    }
-  }
-  reasonSel.addEventListener('change', updateContext);
-  updateContext();
-
-  details.addEventListener('input', function(){
-    var len = details.value.length;
-    count.textContent = len + ' / 1000';
-    count.classList.toggle('cw-warn', len > 900);
-  });
-
-  function openPanel(){
-    overlay.classList.add('cw-open');
-    document.body.style.overflow = 'hidden';
-    setTimeout(function(){ usernameInput.focus(); }, 150);
-  }
-  function closePanel(){
-    overlay.classList.remove('cw-open');
-    document.body.style.overflow = '';
-  }
-  function showStatusView(){
-    form.classList.add('cw-hide');
-    statusView.classList.add('cw-show');
-    statusResult.innerHTML = '';
-    setTimeout(function(){ ticketInput.focus(); }, 100);
-  }
-  function showFormView(){
-    statusView.classList.remove('cw-show');
-    form.classList.remove('cw-hide');
-  }
-  statusToggle.addEventListener('click', showStatusView);
-  statusBack.addEventListener('click', showFormView);
-
-  ticketCopyBtn.addEventListener('click', function(){
-    var id = ticketIdEl.textContent;
-    if (!id) return;
-    var done = function(){ ticketCopyBtn.textContent = 'Copied!'; setTimeout(function(){ ticketCopyBtn.textContent = 'Copy'; }, 1500); };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(id).then(done).catch(function(){});
-    } else {
-      var ta = document.createElement('textarea');
-      ta.value = id; document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); done(); } catch(e){}
-      document.body.removeChild(ta);
-    }
-  });
-
-  checkBtn.addEventListener('click', function(){
-    var id = ticketInput.value.trim();
-    statusResult.innerHTML = '';
-    if (!id) return;
-
-    checkBtn.disabled = true;
-    checkSpin.style.display = 'inline-block';
-
-    var statusUrl = CW_ENDPOINT + '/' + encodeURIComponent(id) + '/status';
-    fetch(statusUrl).then(function(res){
-      if (res.status === 404) throw new Error('not_found');
-      if (!res.ok) throw new Error('error');
-      return res.json();
-    }).then(function(data){
-      var badgeClass = data.status || 'unread';
-      var reasonLabel = REASON_LABELS[data.reason] || 'Other';
-      var statusMsg = STATUS_LABELS[data.status] || '';
-      var when = '';
-      try { when = new Date(data.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); } catch(e){}
-      statusResult.innerHTML =
-        '<div class="cw-status-pill-row"><span class="cw-status-badge ' + badgeClass + '">' + badgeClass + '</span></div>' +
-        '<div class="cw-status-meta">' + statusMsg + '<br>Re: ' + reasonLabel + (when ? ' &middot; sent ' + when : '') + '</div>';
-    }).catch(function(err){
-      var msg = err && err.message === 'not_found'
-        ? "No message found with that ticket ID — double check and try again."
-        : "Couldn't check status — try again in a moment.";
-      statusResult.innerHTML = '<div class="cw-status-error">' + msg + '</div>';
-    }).finally(function(){
-      checkBtn.disabled = false;
-      checkSpin.style.display = 'none';
-    });
-  });
-
-  fab.addEventListener('click', openPanel);
-  closeBtn.addEventListener('click', closePanel);
-  overlay.addEventListener('click', function(e){ if (e.target === overlay) closePanel(); });
-  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && overlay.classList.contains('cw-open')) closePanel(); });
-
-  function resetToForm(){
-    form.classList.remove('cw-hide');
-    success.classList.remove('cw-show');
-    errorBox.classList.remove('cw-show');
-    statusView.classList.remove('cw-show');
-    ticketInput.value = '';
-    statusResult.innerHTML = '';
-  }
-
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    errorBox.classList.remove('cw-show');
-
-    var honeypot = document.getElementById('cwHp').value;
-    if (honeypot) return; // silently drop bots
-
-    var username = usernameInput.value.trim();
-    var reason = reasonSel.value;
-    var detailsVal = details.value.trim();
-
-    if (!username || !detailsVal) {
-      errorBox.textContent = 'Please fill in your name and the details.';
-      errorBox.classList.add('cw-show');
-      return;
-    }
-
-    try { localStorage.setItem('cw_username', username); } catch(e){}
-
-    var payload = {
-      username: username,
-      reason: reason,
-      details: detailsVal,
-      page: (reason === 'fix_chapter' || reason === 'request_translation') ? pageContext() : null,
-      website: honeypot
-    };
-
-    submitBtn.disabled = true;
-    submitBtn.classList.add('cw-loading');
-
-    fetch(CW_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).then(function(res){
-      if (!res.ok) throw new Error('bad status');
-      return res.json();
-    }).then(function(data){
-      successSub.textContent = REASON_SUCCESS[reason] || REASON_SUCCESS.other;
-      ticketIdEl.textContent = (data && data.id) || '';
-      form.classList.add('cw-hide');
-      success.classList.add('cw-show');
-      form.reset();
-      usernameInput.value = username;
-      updateContext();
-      count.textContent = '0 / 1000';
-      setTimeout(function(){ closePanel(); setTimeout(resetToForm, 300); }, 4200);
-    }).catch(function(){
-      errorBox.textContent = "Couldn't send — check your connection and try again.";
-      errorBox.classList.add('cw-show');
-    }).finally(function(){
-      submitBtn.disabled = false;
-      submitBtn.classList.remove('cw-loading');
-    });
-  });
-})();
-</script>
-<!-- ============ END CONTACT WIDGET ============ -->
-
 </body>
 </html>
