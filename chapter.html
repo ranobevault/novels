@@ -129,7 +129,8 @@
 
   .page-view {
     flex: 1;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: 12px 22px 28px;
     max-width: 680px;
     width: 100%;
@@ -137,6 +138,26 @@
     animation: pageFadeIn 0.18s ease;
     min-height: 0;
     box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--text3) transparent;
+  }
+
+  .page-view::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .page-view::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .page-view::-webkit-scrollbar-thumb {
+    background: var(--text3);
+    border-radius: 3px;
+  }
+
+  .page-view::-webkit-scrollbar-thumb:hover {
+    background: var(--text2);
   }
 
   .page-header {
