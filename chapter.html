@@ -1190,14 +1190,24 @@ Thank you for supporting the website.
   document.addEventListener('copy', function(e) {
     e.preventDefault();
     e.stopImmediatePropagation();
+    
+    // Capture what they tried to copy
+    const selection = window.getSelection().toString();
+    
+    // Create blackbox HTML — black text on black background
+    // Only way to read it is to manually select & change text color to white
+    const blackboxHtml = `
+      <div style="background-color: #000000; color: #000000; padding: 12px; font-family: 'Courier New', monospace; white-space: pre-wrap; word-wrap: break-word; border: 1px solid #333;">
+        ${selection.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+      </div>
+    `;
+    
     if (e.clipboardData) {
       e.clipboardData.setData('text/plain', PROTECTED_MESSAGE);
-      e.clipboardData.setData('text/html',
-        `<p style="font-family:monospace;white-space:pre">${PROTECTED_MESSAGE.replace(/\n/g,'<br>')}</p>`
-      );
+      e.clipboardData.setData('text/html', blackboxHtml);
     }
     if (window.getSelection) window.getSelection().removeAllRanges();
-    fireAlert('Copying is not allowed on this page.');
+    fireAlert('Content copied as protected blackboxes — change text color to white to read.');
     return false;
   }, true);
 
