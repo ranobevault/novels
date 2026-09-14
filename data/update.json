@@ -1,5 +1,13 @@
 [
   {
+    "series_id": "witch-hound",
+    "title": "Witch & Hound",
+    "cover": "https://ranobevault.github.io/novels/covers/WusdCXWFX.jpg",
+    "reason": "Vol.1 Ch.3 added",
+    "url": "series.html?id=witch-hound",
+    "timestamp": "2026-09-14T08:41:41.098Z"
+  },
+  {
     "series_id": "childhood-friends-became-popular-idols",
     "title": "Childhood Friends Became Popular Idols",
     "cover": "https://ranobevault.github.io/novels/covers/cover.jpeg",
@@ -150,13 +158,5 @@
     "reason": "Vol.2 Ch.3 added",
     "url": "series.html?id=childhood-friends-became-popular-idols",
     "timestamp": "2026-09-04T09:44:41.529Z"
-  },
-  {
-    "series_id": "childhood-friends-became-popular-idols",
-    "title": "Childhood Friends Became Popular Idols",
-    "cover": "https://ranobevault.github.io/novels/covers/cover.jpeg",
-    "reason": "Vol.2 Ch.3 added",
-    "url": "series.html?id=childhood-friends-became-popular-idols",
-    "timestamp": "2026-09-04T09:42:51.980Z"
   }
 ]
