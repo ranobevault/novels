@@ -176,7 +176,6 @@
   .ch-badge.free { background: rgba(92,224,160,0.12); color: var(--green); }
   .ch-badge.locked { background: rgba(200,169,110,0.13); color: var(--accent); }
   .ch-badge.unlocked { background: rgba(92,224,160,0.13); color: var(--green); }
-  .chapter-item.already-unlocked { cursor: pointer; }
 
   .loading { text-align: center; padding: 40px; color: var(--text3); font-size: 0.9rem; }
   .dot-anim::after { content: ''; animation: dots 1.2s infinite; }
@@ -247,9 +246,9 @@
     <span id="ch-count" style="font-size:0.8rem;color:var(--text3)"></span>
   </div>
   <div id="ad-notice" style="display:none;font-size:0.8rem;color:var(--text3);margin:6px 0 12px;padding:7px 12px;border-left:2px solid var(--accent);background:rgba(200,169,110,0.06)">
-    📢 Locked chapters are free— a short ad is required to access them.
+    📢 Locked chapters are free — a short ad is required to access them.
   </div>
-<div id="ad-notice" style="display:none;font-size:0.8rem;color:var(--text3);margin:6px 0 12px;padding:7px 12px;border-left:2px solid var(--accent);background:rgba(200,169,110,0.06)">
+<div id="ad-notice-2" style="display:none;font-size:0.8rem;color:var(--text3);margin:6px 0 12px;padding:7px 12px;border-left:2px solid var(--accent);background:rgba(200,169,110,0.06)">
     📢 Or <a href="https://ko-fi.com/ranobevault/tiers" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:none;font-weight:600;">read ad-free for just $5/month</a> — enjoy the reading, support the Vault, keep it growing. 📚
 </div>
   <!-- Volume filter tabs — only shown when multiple volumes exist -->
@@ -429,7 +428,10 @@ function buildChapterRows(chapters) {
 function renderChapters(chapters) {
   const list = document.getElementById('chapter-list');
   const notice = document.getElementById('ad-notice');
-  if (notice) notice.style.display = chapters.some(c => c.locked) ? 'block' : 'none';
+  const notice2 = document.getElementById('ad-notice-2');
+  const hasLocked = chapters.some(c => c.locked);
+  if (notice) notice.style.display = hasLocked ? 'block' : 'none';
+  if (notice2) notice2.style.display = hasLocked ? 'block' : 'none';
 
   const totalVisible = chapters.length;
   document.getElementById('ch-count').textContent = `${totalVisible} chapter${totalVisible !== 1 ? 's' : ''}`;
