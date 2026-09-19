@@ -234,31 +234,75 @@
   .hero-logo { width:90px;height:90px;object-fit:contain;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(200,169,110,.3)) }
 
   /* Hide Ko-fi widget scrollbar */
-.kofiWidgetOverlay {
-  overflow: hidden !important;
-}
+  .kofiWidgetOverlay {
+    overflow: hidden !important;
+  }
 
-.kofiWidgetOverlay iframe {
-  height: auto !important;
-  max-height: 600px !important;
-  overflow: hidden !important;
-}
+  .kofiWidgetOverlay iframe {
+    height: auto !important;
+    max-height: 600px !important;
+    overflow: hidden !important;
+  }
 
-/* Target the floating chat specifically */
-.kofiWidgetOverlay .floating-chat {
-  max-height: 500px !important;
-  overflow: hidden !important;
-}
+  /* Target the floating chat specifically */
+  .kofiWidgetOverlay .floating-chat {
+    max-height: 500px !important;
+    overflow: hidden !important;
+  }
 
-/* Hide scrollbar while keeping content accessible */
-.kofiWidgetOverlay::-webkit-scrollbar {
-  display: none;
-}
+  /* Hide scrollbar while keeping content accessible */
+  .kofiWidgetOverlay::-webkit-scrollbar {
+    display: none;
+  }
 
-.kofiWidgetOverlay {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+  .kofiWidgetOverlay {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Ko-fi Widget_2 Floating Button */
+  #kofi-widget-container {
+    position: fixed !important;
+    bottom: 22px !important;
+    left: 22px !important;
+    z-index: 9997 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  #kofi-widget-container a {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, #e8c98e, #c8a96e) !important;
+    color: #1a1410 !important;
+    border: none !important;
+    border-radius: 999px !important;
+    padding: 12px 18px 12px 14px !important;
+    font-family: 'Lato', sans-serif !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,.35) !important;
+    transition: transform .25s ease, box-shadow .25s ease !important;
+  }
+
+  #kofi-widget-container a:hover {
+    transform: translateY(-3px) scale(1.03) !important;
+    box-shadow: 0 10px 26px rgba(0,0,0,.4) !important;
+  }
+
+  #kofi-widget-container a:active {
+    transform: translateY(-1px) scale(.98) !important;
+  }
+
+  @media (max-width: 480px) {
+    #kofi-widget-container {
+      bottom: 80px !important;
+      left: auto !important;
+      right: 22px !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -909,7 +953,13 @@ loadUpdates();
   });
 })();
 </script>
-<!-- ============ END CONTACT WIDGET ============ -->
+
+<!-- Ko-fi Widget_2 -->
+<script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+<script type='text/javascript'>
+  kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'G7E02154JM');
+  kofiwidget2.draw();
+</script>
 
 </body>
 </html>
