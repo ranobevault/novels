@@ -260,13 +260,23 @@
 </div>
 
 <script>
-kofiWidgetOverlay.draw('ranobevault', {
-    'type': 'floating-chat',
-    'floating-chat.donateButton.text': 'Support the Vault 🔓',
-    'floating-chat.donateButton.background-color': '#00b9fe',
-    'floating-chat.donateButton.text-color': '#fff'
-  });
-  
+try {
+  if (typeof kofiWidgetOverlay !== 'undefined') {
+    kofiWidgetOverlay.draw('ranobevault', {
+      'type': 'floating-chat',
+      'floating-chat.donateButton.text': 'Support the Vault 🔓',
+      'floating-chat.donateButton.background-color': '#00b9fe',
+      'floating-chat.donateButton.text-color': '#fff'
+    });
+  } else {
+    console.warn('Ko-fi widget script did not load — skipping donate button.');
+  }
+} catch (e) {
+  console.warn('Ko-fi widget failed to initialize:', e);
+}
+</script>
+
+<script>
 const params = new URLSearchParams(location.search);
 const seriesId = params.get('id');
 let allChapters = [];
