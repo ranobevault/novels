@@ -9,8 +9,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="manifest" href="site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">F
-<script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0d0d12;
@@ -233,20 +232,24 @@
   .logo-img { width:28px;height:28px;object-fit:contain;vertical-align:middle;margin-right:4px }
   .hero-logo { width:90px;height:90px;object-fit:contain;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(200,169,110,.3)) }
 
-  /* Hide Ko-fi widget scrollbar */
+  /* Hide Ko-fi widget scrollbar and keep it perfectly contained */
   .kofiWidgetOverlay {
     overflow: hidden !important;
+    max-width: 100vw !important;
   }
 
   .kofiWidgetOverlay iframe {
     height: auto !important;
     max-height: 600px !important;
+    max-width: 100% !important;
     overflow: hidden !important;
+    border: none !important;
   }
 
   /* Target the floating chat specifically */
   .kofiWidgetOverlay .floating-chat {
     max-height: 500px !important;
+    max-width: 100% !important;
     overflow: hidden !important;
   }
 
@@ -260,7 +263,7 @@
     scrollbar-width: none;
   }
 
-  /* Ko-fi Widget_2 Floating Button */
+  /* Ko-fi Widget_2 Floating Button positioning (bottom-left, opposite the contact button) */
   #kofi-widget-container {
     position: fixed !important;
     bottom: 22px !important;
@@ -729,12 +732,6 @@ loadUpdates();
 </div>
 
 <script>
-  kofiWidgetOverlay.draw('ranobevault', {
-    'type': 'floating-chat',
-    'floating-chat.donateButton.text': 'Support the Vault 🔓',
-    'floating-chat.donateButton.background-color': '#00b9fe',
-    'floating-chat.donateButton.text-color': '#fff'
-  });
 
 (function(){
   var CW_ENDPOINT = 'https://ranobevault-contact.non-admin.workers.dev/message'; // <-- set after deploying the Cloudflare Worker
@@ -952,6 +949,17 @@ loadUpdates();
     });
   });
 })();
+</script>
+
+<!-- ============ KO-FI SUPPORT BUTTON ============ -->
+<script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+<script>
+  kofiWidgetOverlay.draw('ranobevault', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Support the Vault 🔓',
+    'floating-chat.donateButton.background-color': '#fcbf47',
+    'floating-chat.donateButton.text-color': '#323842'
+  });
 </script>
 
 </body>
