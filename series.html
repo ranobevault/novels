@@ -11,7 +11,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
-<script type='text/javascript'>kofiwidget2.init('Support the Vault🔓', '#72a4f2', 'G7E02154JM');kofiwidget2.draw();</script> 
+<script type='text/javascript'>kofiwidget2.init('Support the Vault🔓', '#72a4f2', 'G7E02154JM');kofiwidget2.draw();</script>
+<script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+
 <style>
   :root {
     --bg: #0d0d12; --bg2: #13131c; --bg3: #1a1a28;
@@ -247,6 +249,13 @@
 </div>
 
 <script>
+kofiWidgetOverlay.draw('ranobevault', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Support the Vault 🔓',
+    'floating-chat.donateButton.background-color': '#00b9fe',
+    'floating-chat.donateButton.text-color': '#fff'
+  });
+  
 const params = new URLSearchParams(location.search);
 const seriesId = params.get('id');
 let allChapters = [];
