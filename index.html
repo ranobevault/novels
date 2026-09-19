@@ -232,16 +232,32 @@
   footer a { color: var(--accent); text-decoration: none; }
   .logo-img { width:28px;height:28px;object-fit:contain;vertical-align:middle;margin-right:4px }
   .hero-logo { width:90px;height:90px;object-fit:contain;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(200,169,110,.3)) }
-  /* Hide overflow and constrain the widget */
-.kofi-widget-overlay {
+
+  /* Hide Ko-fi widget scrollbar */
+.kofiWidgetOverlay {
+  overflow: hidden !important;
+}
+
+.kofiWidgetOverlay iframe {
+  height: auto !important;
   max-height: 600px !important;
   overflow: hidden !important;
 }
 
-/* Or target the floating chat specifically */
+/* Target the floating chat specifically */
 .kofiWidgetOverlay .floating-chat {
   max-height: 500px !important;
   overflow: hidden !important;
+}
+
+/* Hide scrollbar while keeping content accessible */
+.kofiWidgetOverlay::-webkit-scrollbar {
+  display: none;
+}
+
+.kofiWidgetOverlay {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 </style>
 </head>
