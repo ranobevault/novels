@@ -1,5 +1,13 @@
 [
   {
+    "series_id": "life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "title": "Life as an Adventurer with the Banished Marquis’ Daughter",
+    "cover": "https://ranobevault.github.io/novels/covers/Life-as-an-Adventurer-with-the-Banished-Marquis-Daughter-LN.jpg",
+    "reason": "Vol.3 Ch.2 added",
+    "url": "series.html?id=life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "timestamp": "2026-09-25T12:55:15.148Z"
+  },
+  {
     "series_id": "isekai-is-surprisingly-kind-to-me",
     "title": "Isekai Is Surprisingly Kind To Me?",
     "cover": "https://ranobevault.github.io/novels/covers/2Us5DoD6U.jpg",
@@ -150,13 +158,5 @@
     "reason": "Vol.1 Ch.3 added",
     "url": "series.html?id=wait-is-that-tyrant-teacher-going-to-be-my-sister",
     "timestamp": "2026-09-16T10:14:43.289Z"
-  },
-  {
-    "series_id": "wait-is-that-tyrant-teacher-going-to-be-my-sister",
-    "title": "Wait, Is That Tyrant Teacher Going to Be My Sister?",
-    "cover": "https://ranobevault.github.io/novels/covers/NzL7xv4ZD.jpg",
-    "reason": "Vol.1 Ch.3 added",
-    "url": "series.html?id=wait-is-that-tyrant-teacher-going-to-be-my-sister",
-    "timestamp": "2026-09-16T10:12:32.010Z"
   }
 ]
