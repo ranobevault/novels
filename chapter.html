@@ -221,60 +221,13 @@
   }
   .chapter-divider span { font-size: 0.7rem; letter-spacing: 0.15em; }
 
-  /* FULLPAGE ILLUSTRATIONS - 80vh CONSISTENT */
-  .chapter-illustration {
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 80vh;
-    max-height: 85vh;
-  }
-
+  /* INLINE ILLUSTRATIONS - flow with the text like any reading site */
+  .chapter-illustration { margin: 1.4em 0; text-align: center; }
   .chapter-illustration img {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 80vh;
-    object-fit: contain;
-    border-radius: 0;
-    display: block;
-    margin: 0 auto;
-    image-rendering: crisp-edges;
+    max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 6px;
   }
-
-  @media (max-width: 640px) {
-    .chapter-illustration {
-      min-height: 75vh;
-      max-height: 80vh;
-    }
-    .chapter-illustration img {
-      max-height: 75vh;
-    }
-  }
-
-  @media (min-width: 641px) and (max-width: 1024px) {
-    .chapter-illustration {
-      min-height: 78vh;
-      max-height: 82vh;
-    }
-    .chapter-illustration img {
-      max-height: 78vh;
-    }
-  }
-
-  @media (min-width: 1025px) {
-    .chapter-illustration {
-      min-height: 80vh;
-      max-height: 85vh;
-    }
-    .chapter-illustration img {
-      max-height: 80vh;
-    }
-  }
+  .page-header, .page-footer { display: none; }
+  .page-view { padding: 16px 20px 80px; }
 
   .chapter-body p {
     font-family: 'Crimson Pro', Georgia, serif;
@@ -282,7 +235,7 @@
     line-height: var(--line-height);
     color: var(--reader-text);
     margin-bottom: 0.7em;
-    text-align: justify;
+    text-align: left; overflow-wrap: break-word;
     transition: font-size 0.2s, color 0.3s;
   }
   .chapter-body p.scrambled {
@@ -704,67 +657,63 @@ function processContent(paragraphs) {
 let allPages = [];
 let currentPage = 0;
 
-function buildPages(paragraphs) {
-  const fs = parseInt(localStorage.getItem('reader_fontsize') || '17');
-  const lineH = fs * 1.85;
-  const paraMargin = fs * 0.7;
+// Repairs broken quotes in already-published chapters. Idempotent: text that is already
+// clean (e.g. output of the translator's normalizeTranslationText) comes back unchanged.
+function fixQuoteLine(l) {
+  l = l.replace(/(^|[\s(\[—-])"(?=\S)/g, '$1“').replace(/"/g, '”');
+  l = l.replace(/(\w)'(\w)/g, '$1’$2');
+  l = l.replace(/([“「『])\s+/g, '$1');
+  return l;
+}
 
-  const topBar = 54;
-  const pageHeader = 42;
-  const pageFooter = 44;
-  const padding = 12 + 28;
-  
-  const contentWidth = Math.min(window.innerWidth - 44, 680);
-  const availableHeight = window.innerHeight - topBar - pageHeader - pageFooter - padding;
-  
-  const charWidth = fs * 0.52;
-  const charsPerLine = Math.floor(contentWidth / charWidth);
+function normalizeParagraphs(paras) {
+  const SPECIAL = p => p.startsWith('[img]') || p.startsWith('>') || p.startsWith('spell ') ||
+                       p.startsWith('//') || p.startsWith('NAME:') || p.startsWith('SYSTEM');
+  const quoteCount = s => (s.match(/[“”"]/g) || []).length;
+  const out = [];
+  let carry = '';
 
-  function estimateParaHeight(text) {
-    if (text.startsWith('[img]')) {
-      return window.innerHeight * 0.8 + (fs * 0.5);
-    }
-    if (text.startsWith('>') || text.startsWith('//') || 
-        text.startsWith('NAME:') || text.startsWith('SYSTEM') || text.startsWith('spell ')) {
-      const lines = text.split('\n').length;
-      return (lines * lineH) + (fs * 0.5) + paraMargin;
-    }
-    if (!text.trim()) return fs * 0.5;
-    const lines = Math.max(1, Math.ceil(text.length / charsPerLine));
-    return (lines * lineH) + paraMargin;
-  }
-
-  const pages = [];
-  let currentPageBuffer = [];
-  let currentPageHeight = 0;
-
-  paragraphs.forEach((para) => {
-    const paraHeight = estimateParaHeight(para);
-    const totalWithNewPara = currentPageHeight + paraHeight;
-    const contentParas = currentPageBuffer.filter(p =>
-      !p.startsWith('>') && !p.startsWith('//') && !p.startsWith('NAME:') &&
-      !p.startsWith('SYSTEM') && !p.startsWith('spell ') && !p.startsWith('[img]'));
-
-    const isShortContent = paraHeight < lineH * 3;
-    const hasContentOnPage = contentParas.length > 0;
-
-    if (totalWithNewPara > availableHeight && hasContentOnPage) {
-      if (isShortContent && currentPageHeight + paraHeight < availableHeight * 1.15) {
-        currentPageBuffer.push(para);
-        currentPageHeight += paraHeight;
-      } else {
-        if (currentPageBuffer.length > 0) pages.push([...currentPageBuffer]);
-        currentPageBuffer = [para];
-        currentPageHeight = paraHeight;
-      }
-    } else {
-      currentPageBuffer.push(para);
-      currentPageHeight += paraHeight;
-    }
+  // split embedded line breaks, but never touch image / system-window lines
+  const flat = [];
+  (paras || []).forEach(p => {
+    p = String(p == null ? '' : p);
+    if (SPECIAL(p)) flat.push(p);
+    else p.replace(/\r/g, '').split('\n').forEach(x => flat.push(x));
   });
 
-  if (currentPageBuffer.length > 0) pages.push(currentPageBuffer);
-  return pages.length > 0 ? pages : [paragraphs];
+  for (const raw of flat) {
+    if (SPECIAL(raw)) {
+      if (carry) { out.push(fixQuoteLine(carry)); carry = ''; }
+      out.push(raw);
+      continue;
+    }
+    let l = raw.trim();
+    if (!l) continue;
+
+    // lone quote mark on its own paragraph
+    if (/^[“"‘「『]$/.test(l) || l === '”') {
+      const prev = out.length ? out[out.length - 1] : '';
+      const prevOpen = prev && !SPECIAL(prev) && quoteCount(prev) % 2 === 1;
+      const isCloser = l === '”' || (l === '"' && prevOpen);
+      if (isCloser) { if (prevOpen) out[out.length - 1] = prev + '”'; }   // stray closer on a balanced line is dropped
+      else carry += (l === '"' ? '“' : l);
+      continue;
+    }
+
+    if (carry) { l = (/^[“"‘「『]+$/.test(carry) && /^[“"‘「『]/.test(l)) ? l : carry + l; carry = ''; }
+
+    // paragraph ends with a dangling opening quote -> join with the next paragraph
+    if (/(^|\s)"$/.test(l) || /[“「『]$/.test(l)) { carry = /"$/.test(l) ? l.slice(0, -1) + '“' : l; continue; }
+
+    out.push(fixQuoteLine(l));
+  }
+  if (carry) out.push(fixQuoteLine(carry));
+  return out;
+}
+
+// Continuous scrolling: the whole chapter is one long page.
+function buildPages(paragraphs) {
+  return [normalizeParagraphs(paragraphs)];
 }
 
 const pageCache = new Map();
@@ -813,10 +762,7 @@ function renderPage(pageIndex) {
   const isLastPage = pageIndex === allPages.length - 1;
   const isFirstPage = pageIndex === 0;
 
-  const bar = document.getElementById('progress');
-  if (bar) bar.style.width = allPages.length <= 1 ? '100%' : ((pageIndex / (allPages.length - 1)) * 100) + '%';
 
-  localStorage.setItem(`pos_${hash}`, pageIndex);
 
   let bodyHtml = '';
   if (isFirstPage) {
@@ -861,55 +807,34 @@ function renderPage(pageIndex) {
   }
 
   const wrap = document.querySelector('.chapter-wrap');
-  const MAX_PIPS = 20;
-  const total = allPages.length;
-  let pipsHtml = '';
-  if (total <= MAX_PIPS) {
-    pipsHtml = Array.from({length: total}, (_, i) =>
-      `<span class="pip${i === pageIndex ? ' pip-active' : ''}"></span>`
-    ).join('');
-  } else {
-    for (let i = 0; i < total; i++) {
-      const near = Math.abs(i - pageIndex) <= 1 || i === 0 || i === total - 1;
-      const edgeDot = (i === 1 && pageIndex > 2) || (i === total - 2 && pageIndex < total - 3);
-      if (near) {
-        pipsHtml += `<span class="pip${i === pageIndex ? ' pip-active' : ''}"></span>`;
-      } else if (edgeDot) {
-        pipsHtml += `<span class="pip pip-ellipsis"></span>`;
-      }
-    }
-  }
-  wrap.innerHTML = `
-    <div class="page-header">
-      <div class="page-pip-counter">${pipsHtml}</div>
-      <div class="page-label">${pageIndex + 1} / ${total}</div>
-    </div>
-    <div class="page-view${isFirstPage ? ' page-1' : ''}">${bodyHtml}</div>
-    <div class="page-footer">
-      <div class="page-counter">Page <strong>${pageIndex + 1}</strong> / ${allPages.length}</div>
-    </div>`;
+  wrap.innerHTML = `<div class="page-view page-1">${bodyHtml}</div>`;
 
   const pv = wrap.querySelector('.page-view');
   if (pv) {
-    let tapStartX = 0, tapStartY = 0, tapStartScroll = 0, tapStartTime = 0;
-    pv.addEventListener('touchstart', e => {
-      tapStartX = e.touches[0].clientX;
-      tapStartY = e.touches[0].clientY;
-      tapStartScroll = pv.scrollTop;
-      tapStartTime = Date.now();
+    const bar = document.getElementById('progress');
+    const key = `scroll_${hash}`;
+    const saved = parseFloat(localStorage.getItem(key) || '0') || 0;
+    let touched = false;
+    ['wheel', 'touchstart', 'mousedown', 'keydown'].forEach(ev =>
+      pv.addEventListener(ev, () => { touched = true; }, { passive: true, once: true }));
+    const restore = () => {
+      if (touched || !saved) return;
+      pv.scrollTop = saved * (pv.scrollHeight - pv.clientHeight);
+    };
+    requestAnimationFrame(restore);
+    pv.querySelectorAll('img').forEach(im => im.addEventListener('load', restore, { once: true }));
+
+    let t;
+    pv.addEventListener('scroll', () => {
+      const max = pv.scrollHeight - pv.clientHeight;
+      const ratio = max > 0 ? Math.min(1, pv.scrollTop / max) : 0;
+      if (bar) bar.style.width = (ratio * 100) + '%';
+      clearTimeout(t);
+      t = setTimeout(() => { try { localStorage.setItem(key, ratio); } catch (e) {} }, 200);
     }, { passive: true });
-    pv.addEventListener('touchend', e => {
-      const dx = Math.abs(e.changedTouches[0].clientX - tapStartX);
-      const dy = Math.abs(e.changedTouches[0].clientY - tapStartY);
-      const scrolled = Math.abs(pv.scrollTop - tapStartScroll);
-      const duration = Date.now() - tapStartTime;
-      
-      if (dx < 12 && dy < 12 && scrolled < 8 && duration < 250) {
-        const xPct = tapStartX / window.innerWidth;
-        if (xPct < 0.30 && currentPage > 0) renderPage(currentPage - 1);
-        else if (xPct > 0.70 && currentPage < allPages.length - 1) renderPage(currentPage + 1);
-      }
-    }, { passive: true });
+
+    pv.tabIndex = -1;                       // arrow keys / space scroll natively
+    pv.focus({ preventScroll: true });
   }
 
   if (isFirstPage) {
@@ -920,7 +845,6 @@ function renderPage(pageIndex) {
     }).catch(()=>{});
   }
 
-  setTimeout(() => preloadAdjacent(pageIndex), 100);
   applyFontSize();
 }
 
@@ -935,8 +859,7 @@ function renderChapter() {
 
   setupProgress();
 
-  const savedPage = parseInt(localStorage.getItem(`pos_${hash}`) || '0');
-  renderPage((savedPage > 0 && savedPage < allPages.length) ? savedPage : 0);
+  renderPage(0);
 }
 
 function showAdwall(targetHash) {
@@ -971,16 +894,7 @@ function handleAdwallClick(e) {
   }
 }
 
-function setupProgress() {
-  document.addEventListener('keydown', function(e) {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-      if (currentPage < allPages.length - 1) renderPage(currentPage + 1);
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-      if (currentPage > 0) renderPage(currentPage - 1);
-    }
-  });
-}
+function setupProgress() { /* native scrolling handles keys and touch */ }
 
 document.getElementById('settings-btn').onclick = () => {
   document.getElementById('settings-panel').classList.toggle('open');
@@ -1006,13 +920,13 @@ function applyMode() {
 document.getElementById('font-inc').onclick = () => {
   if (fontSize < 24) {
     fontSize++; applyFontSize(); localStorage.setItem('reader_fontsize', fontSize);
-    if (chapterData) { pageCache.clear(); allPages = buildPages(chapterData.content || []); renderPage(0); }
+    
   }
 };
 document.getElementById('font-dec').onclick = () => {
   if (fontSize > 13) {
     fontSize--; applyFontSize(); localStorage.setItem('reader_fontsize', fontSize);
-    if (chapterData) { pageCache.clear(); allPages = buildPages(chapterData.content || []); renderPage(0); }
+    
   }
 };
 document.getElementById('mode-toggle').onclick = () => { isLight = !isLight; applyMode(); localStorage.setItem('reader_light', isLight ? '1' : '0'); };
@@ -1040,20 +954,6 @@ function saveProgress() {
   localStorage.setItem(`continue_${currentEntry.series}`, JSON.stringify(data));
   localStorage.setItem(`read_${hash}`, '1');
 }
-
-let resizeTimeout;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    if (chapterData && allPages.length > 0) {
-      const oldPage = currentPage;
-      pageCache.clear();
-      allPages = buildPages(chapterData.content || []);
-      const newPage = Math.min(oldPage, allPages.length - 1);
-      renderPage(newPage);
-    }
-  }, 300);
-}, { passive: true });
 
 init();
 
