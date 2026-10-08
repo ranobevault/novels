@@ -271,5 +271,21 @@
     "status": "Ongoing",
     "author": "悠/陽波ゆうい",
     "rating": 0
+  },
+  {
+    "id": "wand-maker-of-the-ruined-world",
+    "title": "Wand Maker of the Ruined World",
+    "cover": "https://ranobevault.github.io/novels/covers/r6bTj7w6f.jpeg",
+    "genres": [
+      "Adventure",
+      "Fantasy",
+      "Slice of Life"
+    ],
+    "synopsis": "A post-apocalyptic story of clumsy over-technology, starring a highly skilled protagonist who can tattoo the Golden Pavilion on the back of a chisel.",
+    "latest_volume": 1,
+    "latest_chapter": 1,
+    "status": "Ongoing",
+    "author": "黒留ハガネ",
+    "rating": 0
   }
 ]
