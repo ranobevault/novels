@@ -476,6 +476,7 @@
     <div class="tab-item active" data-tab="new-series"><span class="tab-icon">📚</span><span class="tab-label">New Series</span></div>
     <div class="tab-item" data-tab="batch-upload"><span class="tab-icon">📦</span><span class="tab-label">Batch Upload</span></div>
     <div class="tab-item" data-tab="update-series"><span class="tab-icon">✏️</span><span class="tab-label">Update Series</span></div>
+    <div class="tab-item" data-tab="edit-series"><span class="tab-icon">📝</span><span class="tab-label">Edit Series</span></div>
     <div class="tab-item" data-tab="hashmap"><span class="tab-icon">🗺️</span><span class="tab-label">Hash Map</span></div>
     <div class="tab-item" data-tab="quick-actions"><span class="tab-icon">⚡</span><span class="tab-label">Quick Actions</span></div>
     <div class="tab-item" data-tab="messages"><span class="tab-icon">💬</span><span class="tab-label">Messages</span><span class="tab-badge" id="msg-badge" style="display:none">0</span></div>
@@ -740,6 +741,89 @@
 
         <div class="upload-progress" id="us-progress"><div class="upload-bar" id="us-bar" style="width:0%"></div></div>
         <div class="log-box" id="us-log"></div>
+      </div>
+    </div>
+
+    <!-- EDIT SERIES -->
+    <div class="tab-pane" id="tab-edit-series">
+      <div class="card">
+        <div class="card-title">📝 Edit Series Details</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Select Series *</label>
+            <select class="form-select" id="es-series" onchange="esOnSelect()">
+              <option value="">— Select series —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Series ID (locked)</label>
+            <input class="form-input" id="es-id" disabled style="font-family:monospace;opacity:.6">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Series Title *</label>
+            <input class="form-input" id="es-title">
+          </div>
+          <div class="form-group">
+            <label>Author</label>
+            <input class="form-input" id="es-author">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-select" id="es-status">
+              <option>Ongoing</option>
+              <option>Completed</option>
+              <option>Hiatus</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Rating</label>
+            <input class="form-input" id="es-rating" type="number" step="0.1" min="0" max="5">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full">
+            <label>Genres (comma-separated)</label>
+            <input class="form-input" id="es-genres" placeholder="Fantasy, Isekai, Magic">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full">
+            <label>Synopsis</label>
+            <textarea class="form-textarea" id="es-synopsis" rows="5"></textarea>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full">
+            <label>Cover Image URL</label>
+            <input class="form-input" id="es-cover" placeholder="https://... or upload a file below">
+            <div style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <label style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:0.82rem;color:var(--text2)">
+                🖼️ Choose new cover
+                <input type="file" id="es-cover-file" accept="image/*" style="display:none" onchange="esCoverSelected(this)">
+              </label>
+              <span id="es-cover-filename" style="font-size:0.8rem;color:var(--text2);font-style:italic"></span>
+              <button class="btn-sm" id="es-cover-btn" style="display:none" onclick="esUploadCover()">⬆️ Upload to GitHub</button>
+            </div>
+            <img id="es-cover-preview" alt="" style="display:none;margin-top:10px;width:90px;height:126px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-sm primary" id="es-save" onclick="esSave()">💾 Save Changes</button>
+          <button class="btn-sm" onclick="esOnSelect()">↺ Reset</button>
+        </div>
+
+        <div class="log-box" id="es-log"></div>
       </div>
     </div>
 
@@ -2764,6 +2848,157 @@ async function msgDelete(id) {
   }
 }
 
+// ========== EDIT SERIES ==========
+let esCoverFile = null;
+
+async function esLoadSeries(keepId) {
+  const cfg = getConfig(); if (!cfg) return;
+  try {
+    const { data } = await ghGetJSON(cfg, 'data/series.json');
+    cachedSeries = data || [];
+    const sel = document.getElementById('es-series');
+    const current = keepId || sel.value;
+    sel.innerHTML = '<option value="">— Select series —</option>';
+    cachedSeries.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.id; o.textContent = s.title;
+      sel.appendChild(o);
+    });
+    sel.value = current || '';
+    esOnSelect();
+  } catch (e) { log('es-log', '❌ Failed to load series: ' + e.message, 'err'); }
+}
+
+function esOnSelect() {
+  const id = document.getElementById('es-series').value;
+  const s = (cachedSeries || []).find(x => x.id === id);
+  const set = (k, v) => document.getElementById(k).value = v;
+  esCoverFile = null;
+  document.getElementById('es-cover-filename').textContent = '';
+  document.getElementById('es-cover-btn').style.display = 'none';
+  document.getElementById('es-cover-btn').disabled = false;
+  document.getElementById('es-cover-btn').textContent = '⬆️ Upload to GitHub';
+  document.getElementById('es-cover-file').value = '';
+  if (!s) {
+    ['es-id','es-title','es-author','es-genres','es-synopsis','es-cover','es-rating'].forEach(k => set(k, ''));
+    document.getElementById('es-cover-preview').style.display = 'none';
+    return;
+  }
+  set('es-id', s.id);
+  set('es-title', s.title || '');
+  set('es-author', s.author || '');
+  set('es-status', s.status || 'Ongoing');
+  set('es-rating', s.rating ?? 0);
+  set('es-genres', (s.genres || []).join(', '));
+  set('es-synopsis', s.synopsis || '');
+  set('es-cover', s.cover || '');
+  esUpdateCoverPreview();
+}
+
+function esUpdateCoverPreview() {
+  const url = document.getElementById('es-cover').value.trim();
+  const img = document.getElementById('es-cover-preview');
+  if (url) { img.src = url; img.style.display = 'block'; } else { img.style.display = 'none'; }
+}
+document.getElementById('es-cover').addEventListener('change', esUpdateCoverPreview);
+
+function esCoverSelected(input) {
+  const f = input.files[0]; if (!f) return;
+  esCoverFile = f;
+  document.getElementById('es-cover-filename').textContent = f.name;
+  document.getElementById('es-cover-btn').style.display = 'inline-flex';
+}
+
+async function esUploadCover() {
+  const cfg = getConfig(); if (!cfg) return;
+  if (!esCoverFile) return;
+  const btn = document.getElementById('es-cover-btn');
+  btn.disabled = true; btn.textContent = 'Uploading...';
+  try {
+    const base64 = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result.split(',')[1]);
+      r.onerror = rej;
+      r.readAsDataURL(esCoverFile);
+    });
+    const extMatch = esCoverFile.name.match(/\.[a-zA-Z0-9]+$/);
+    const safeName = genHash(9) + (extMatch ? extMatch[0].toLowerCase() : '.jpg');
+    const path = `covers/${safeName}`;
+    const res = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${cfg.token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `Add cover: ${safeName}`, content: base64, branch: cfg.branch })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || res.status);
+    }
+    document.getElementById('es-cover').value = `https://${cfg.owner}.github.io/${cfg.repo}/${path}`;
+    document.getElementById('es-cover-filename').textContent = `✓ ${safeName}`;
+    btn.textContent = '✅ Uploaded';
+    esUpdateCoverPreview();
+  } catch (e) {
+    alert('Cover upload failed: ' + e.message);
+    btn.disabled = false; btn.textContent = '⬆️ Upload to GitHub';
+  }
+}
+
+async function esSave() {
+  const cfg = getConfig(); if (!cfg) return;
+  const id = document.getElementById('es-series').value;
+  if (!id) { alert('Please select a series first.'); return; }
+  const title = document.getElementById('es-title').value.trim();
+  if (!title) { alert('Title cannot be empty.'); return; }
+  if (esCoverFile && document.getElementById('es-cover-btn').textContent.indexOf('Uploaded') === -1) {
+    if (!confirm('You picked a new cover but haven\'t uploaded it yet. Save without it?')) return;
+  }
+
+  clearLog('es-log');
+  document.getElementById('es-save').disabled = true;
+  log('es-log', 'Saving changes...', 'info');
+
+  try {
+    // 1. series.json (fresh fetch for a current SHA)
+    const { data: arr, sha } = await ghGetJSON(cfg, 'data/series.json');
+    const idx = (arr || []).findIndex(s => s.id === id);
+    if (idx === -1) throw new Error(`Series "${id}" not found in series.json`);
+
+    const oldCover = arr[idx].cover, oldTitle = arr[idx].title;
+    const cover = document.getElementById('es-cover').value.trim() || oldCover;
+
+    arr[idx] = {
+      ...arr[idx],
+      title,
+      author: document.getElementById('es-author').value.trim(),
+      status: document.getElementById('es-status').value,
+      rating: parseFloat(document.getElementById('es-rating').value) || 0,
+      genres: document.getElementById('es-genres').value.split(',').map(s => s.trim()).filter(Boolean),
+      synopsis: document.getElementById('es-synopsis').value.trim(),
+      cover
+    };
+    await ghPutFile(cfg, 'data/series.json', JSON.stringify(arr, null, 2), `Edit series: ${title}`, sha);
+    log('es-log', 'series.json updated ✓', 'ok');
+
+    // 2. Keep the updates feed in sync if title/cover changed
+    if (title !== oldTitle || cover !== oldCover) {
+      const { data: upd, sha: updSha } = await ghGetJSON(cfg, 'data/update.json');
+      if (upd && upd.some(u => u.series_id === id)) {
+        upd.forEach(u => { if (u.series_id === id) { u.title = title; u.cover = cover; } });
+        await ghPutFile(cfg, 'data/update.json', JSON.stringify(upd, null, 2), `Sync feed: ${title}`, updSha);
+        log('es-log', 'update.json synced ✓', 'ok');
+      }
+    }
+
+    log('es-log', `✅ "${title}" saved.`, 'ok');
+    await esLoadSeries(id);
+  } catch (e) {
+    log('es-log', `❌ ${e.message}`, 'err');
+    console.error(e);
+  } finally {
+    document.getElementById('es-save').disabled = false;
+  }
+}
+
 // ========== TAB SWITCHING ==========
 document.querySelectorAll('.tab-item').forEach(item => {
   item.addEventListener('click', () => {
@@ -2774,6 +3009,7 @@ document.querySelectorAll('.tab-item').forEach(item => {
     if (item.dataset.tab === 'update-series' && document.getElementById('us-series').options.length <= 1) loadSeriesDropdown();
     if (item.dataset.tab === 'hashmap') loadHashmap();
     if (item.dataset.tab === 'batch-upload') batchInitTab();
+    if (item.dataset.tab === 'edit-series') esLoadSeries();
     if (item.dataset.tab === 'delete') { delLoadSeries(); }
     if (item.dataset.tab === 'messages') { loadMessages(); }
   });
