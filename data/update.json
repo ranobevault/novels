@@ -1,5 +1,13 @@
 [
   {
+    "series_id": "life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "title": "Life as an Adventurer with the Banished Marquis’ Daughter",
+    "cover": "https://ranobevault.github.io/novels/covers/Life-as-an-Adventurer-with-the-Banished-Marquis-Daughter-LN.jpg",
+    "reason": "Vol.3 Ch.4 added",
+    "url": "series.html?id=life-as-an-adventurer-with-the-banished-marquis-daughter",
+    "timestamp": "2026-10-31T10:27:29.122Z"
+  },
+  {
     "series_id": "isekai-is-surprisingly-kind-to-me",
     "title": "Isekai Is Surprisingly Kind To Me?",
     "cover": "https://ranobevault.github.io/novels/covers/2Us5DoD6U.jpg",
@@ -150,13 +158,5 @@
     "reason": "Vol.1 Ch.7 added",
     "url": "series.html?id=isekai-is-surprisingly-kind-to-me",
     "timestamp": "2026-10-17T12:31:42.318Z"
-  },
-  {
-    "series_id": "wand-maker-of-the-ruined-world",
-    "title": "Wand Maker of the Ruined World",
-    "cover": "https://ranobevault.github.io/novels/covers/r6bTj7w6f.jpeg",
-    "reason": "Vol.1 Ch.6 added",
-    "url": "series.html?id=wand-maker-of-the-ruined-world",
-    "timestamp": "2026-10-14T10:51:06.578Z"
   }
 ]
