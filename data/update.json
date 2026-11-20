@@ -1,5 +1,13 @@
 [
   {
+    "series_id": "valkyrie-bullet",
+    "title": "Valkyrie Bullet",
+    "cover": "https://i.imgur.com/b6Vd69k.jpeg",
+    "reason": "Vol.3 Ch.3 added",
+    "url": "series.html?id=valkyrie-bullet",
+    "timestamp": "2026-11-20T12:11:39.780Z"
+  },
+  {
     "series_id": "wait-is-that-tyrant-teacher-going-to-be-my-sister",
     "title": "Wait, Is That Tyrant Teacher Going to Be My Sister?",
     "cover": "https://ranobevault.github.io/novels/covers/NzL7xv4ZD.jpg",
@@ -150,13 +158,5 @@
     "reason": "Vol.1 Ch.7 added",
     "url": "series.html?id=no-wonder-i-m-unwanted-in-this-c-astity-reversed-world",
     "timestamp": "2026-11-11T05:21:33.655Z"
-  },
-  {
-    "series_id": "no-wonder-i-m-unwanted-in-this-c-astity-reversed-world",
-    "title": "No Wonder I’m Unwanted in This C*astity-Reversed World",
-    "cover": "https://ranobevault.github.io/novels/covers/kbA18Ilfu.jpg",
-    "reason": "Vol.1 Ch.6 added",
-    "url": "series.html?id=no-wonder-i-m-unwanted-in-this-c-astity-reversed-world",
-    "timestamp": "2026-11-11T05:18:55.181Z"
   }
 ]
