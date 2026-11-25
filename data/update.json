@@ -3,6 +3,14 @@
     "series_id": "valkyrie-bullet",
     "title": "Valkyrie Bullet",
     "cover": "https://i.imgur.com/b6Vd69k.jpeg",
+    "reason": "Vol.3 Ch.7 added",
+    "url": "series.html?id=valkyrie-bullet",
+    "timestamp": "2026-11-25T11:45:31.202Z"
+  },
+  {
+    "series_id": "valkyrie-bullet",
+    "title": "Valkyrie Bullet",
+    "cover": "https://i.imgur.com/b6Vd69k.jpeg",
     "reason": "Vol.3 Ch.6 added",
     "url": "series.html?id=valkyrie-bullet",
     "timestamp": "2026-11-25T11:43:48.035Z"
@@ -150,13 +158,5 @@
     "reason": "Vol.1 Ch.11 added",
     "url": "series.html?id=wand-maker-of-the-ruined-world",
     "timestamp": "2026-11-17T09:39:25.548Z"
-  },
-  {
-    "series_id": "when-i-picked-up-an-insanely-pretty-downer-type-girl-outside-my-front-door",
-    "title": "When I Picked Up an Insanely Pretty Downer-Type Girl Outside My Front Door",
-    "cover": "https://ranobevault.github.io/novels/covers/4FyJJ40QY.jpg",
-    "reason": "Vol.1 Ch.1 added",
-    "url": "series.html?id=when-i-picked-up-an-insanely-pretty-downer-type-girl-outside-my-front-door",
-    "timestamp": "2026-11-16T07:37:04.906Z"
   }
 ]
